@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "painter", "painter\painter.csproj", "{8BECF6EB-64B5-4044-BB3E-83FF0C3CBE05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "silly_substitutions", "silly_substitutions\silly_substitutions.csproj", "{414915E9-B908-4692-AB63-7621C6D84FF6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BECF6EB-64B5-4044-BB3E-83FF0C3CBE05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BECF6EB-64B5-4044-BB3E-83FF0C3CBE05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BECF6EB-64B5-4044-BB3E-83FF0C3CBE05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BECF6EB-64B5-4044-BB3E-83FF0C3CBE05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{414915E9-B908-4692-AB63-7621C6D84FF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{414915E9-B908-4692-AB63-7621C6D84FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{414915E9-B908-4692-AB63-7621C6D84FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{414915E9-B908-4692-AB63-7621C6D84FF6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

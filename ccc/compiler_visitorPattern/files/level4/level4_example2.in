@@ -1,0 +1,11 @@
+10
+start
+if false
+end
+else
+postpone
+print first
+end
+end
+print Second
+end
