@@ -5,7 +5,7 @@ namespace compiler_visitorPattern.tokens;
 public class VarToken : BaseToken {
     public string Name { get; }
 
-    public override EStatus Accept(IVisitor visitor) {
+    public override string Accept(IVisitor visitor) {
         return visitor.Visit(this);
     }
 

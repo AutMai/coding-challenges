@@ -9,112 +9,138 @@ namespace compiler_visitorPattern;
 
 public class TokenVisitor : IVisitor {
     private readonly StringBuilder _result = new();
-    private readonly StringBuilder _builder = new();
+    private readonly StringBuilder _functionOutputBuilder = new();
 
     public string Output => _result.ToString();
 
-    public EStatus Visit(RootToken token) {
+    public string Visit(RootToken token) {
         return VisitChildren(token.Children);
     }
 
-    public EStatus Visit(StartToken token) {
-        if (VisitChildren(token.Children) == EStatus.Error)
-            _result.Append("ERROR\n");
+    public string Visit(StartToken token) {
+        var returnValue = VisitChildren(token.Children);
+        if (returnValue == "Error")
+            _result.Append("ERROR");
         else {
-            _builder.Append("\n");
-            _result.Append(_builder.ToString());
+            _result.Append(_functionOutputBuilder);
+            
+            _functionOutputBuilder.Clear();
         }
-
-        _builder.Clear();
-
-        return EStatus.Continue;
+        
+        return returnValue;
     }
 
-    private EStatus VisitChildren(IReadOnlyList<BaseToken> children, int startIndex = 0) {
+    private string VisitChildren(IReadOnlyList<BaseToken> children, int startIndex = 0, bool called = false) {
         for (var i = startIndex; i < children.Count; i++) {
-            var status = children[i].Accept(this);
-            switch (status) {
-                case EStatus.ExitFunction:
-                    return EStatus.ExitFunction;
-                case EStatus.Error:
-                    return EStatus.Error;
+            var returnValue = children[i].Accept(this);
+            if (children[i].ParentToken is RootToken) {
+                _result.Append('\n');
+                _functionOutputBuilder.Clear();
+            }
+
+            switch (returnValue) {
+                case "Error":
+                    _result.Append("ERROR");
+                    _functionOutputBuilder.Clear();
+                    if (called) return EStatus.Error.ToString();
+                    break;
+                case "Continue":
+                    break;
+                default:
+                    if (children[i] is ReturnToken) return returnValue;
+                    if (called) return returnValue;
+                    break;
             }
         }
 
-        return EStatus.Continue;
+        return "true";
     }
 
-    public EStatus Visit(IfToken token) => ConvertToDatatype(token) is not bool expressionBool
-        ? EStatus.Error
+    public string Visit(IfToken token) => EvaluateValue(token) is not bool expressionBool
+        ? EStatus.Error.ToString()
         : VisitChildren(expressionBool ? token.Children : token.ElseToken.Children);
 
 
-    public EStatus Visit(ElseToken token) => VisitChildren(token.Children);
+    public string Visit(ElseToken token) => VisitChildren(token.Children);
 
-    public EStatus Visit(ReturnToken token) => EStatus.ExitFunction;
-
-    public EStatus Visit(PrintToken token) {
-        var value = ConvertToDatatype(token);
+    public string Visit(ReturnToken token) {
+        var value = EvaluateValue(token);
         value = value is bool ? value.ToString()?.ToLower() : value.ToString();
-        _builder.Append(value);
-        return EStatus.Continue;
+        return value.ToString();
     }
 
-    public EStatus Visit(VarToken token) {
-        var startToken = (StartToken)GetFunctionToken(token);
+    public string Visit(PrintToken token) {
+        var value = EvaluateValue(token);
+
+        value = value is bool ? value.ToString()?.ToLower() : value.ToString();
+        _functionOutputBuilder.Append(value);
+        return EStatus.Continue.ToString();
+    }
+
+    public string Visit(VarToken token) {
+        var startToken = (StartToken)token.GetFunctionToken();
         if (startToken.Variables.Exists(v => v.Name == token.Name)) {
-            return EStatus.Error;
+            return EStatus.Error.ToString();
         }
 
-        var value = ConvertToDatatype(token);
+        var value = EvaluateValue(token);
         startToken.Variables.Add(new Variable { Name = token.Name, Value = value });
-        return EStatus.Continue;
+        return EStatus.Continue.ToString();
     }
 
-    private static BaseToken GetFunctionToken(BaseToken token) {
-        if (token is StartToken) {
-            return token;
-        }
-
-        token = token.ParentToken;
-        token = GetFunctionToken(token);
-        return token;
-    }
-
-    public EStatus Visit(SetToken token) {
-        var startToken = (StartToken)GetFunctionToken(token);
+    public string Visit(SetToken token) {
+        var startToken = (StartToken)token.GetFunctionToken();
         var variable = startToken.Variables.SingleOrDefault(v => v.Name == token.Name);
-        if (variable == null) return EStatus.Error;
-        var value = ConvertToDatatype(token);
+        if (variable == null) return EStatus.Error.ToString();
+        var value = EvaluateValue(token);
         variable.Value = value;
-        return EStatus.Continue;
+        return EStatus.Continue.ToString();
     }
 
-    public EStatus Visit(PostponeToken token) {
+    public string Visit(PostponeToken token) {
         AppendTokens(token.ParentToken, token.Children);
-        return EStatus.Continue;
+        return EStatus.Continue.ToString();
+    }
+
+    public string Visit(CallToken token) {
+        var value = EvaluateValue(token);
+        if (!int.TryParse(value.ToString(), out _)) {
+            return EStatus.Error.ToString();
+        }
+        var functionToken = token.GetRootToken().Children[Convert.ToInt32(value) - 1];
+        return VisitChildren(functionToken.Children, called: true);
     }
 
     private void AppendTokens(BaseToken parentToken, List<BaseToken> childTokens) {
-        childTokens.ForEach(t=>t.ParentToken = parentToken);
+        childTokens.ForEach(t => t.ParentToken = parentToken);
         parentToken.Children.AddRange(childTokens);
     }
 
-    
-    private object ConvertToDatatype(BaseToken token) {
-        var input = token.Value;
-        var startToken = (StartToken)GetFunctionToken(token);
-        switch (input) {
+    private object EvaluateValue(BaseToken token) {
+        var value = token.Value;
+        var startToken = (StartToken)token.GetFunctionToken();
+        
+
+        if (startToken.Variables.Exists(v => v.Name == value.ToString())) 
+            return startToken.Variables.SingleOrDefault(v => v.Name == (string)value)?.Value;
+        if (int.TryParse(value.ToString(), out _))
+            return Convert.ToInt32(value);
+
+        if (value is CallToken callToken) {
+            value = callToken.Accept(this);
+        }
+        
+        switch (value) {
             case "true":
                 return true;
             case "false":
                 return false;
         }
+        
+        return value;
 
-        if (startToken.Variables.Exists(v => v.Name == input))
-            return startToken.Variables.SingleOrDefault(v => v.Name == input)?.Value;
-        if (int.TryParse(input, out _))
-            return Convert.ToInt32(input);
-        return input;
     }
+
+
+
 }

@@ -3,7 +3,7 @@
 namespace compiler_visitorPattern.tokens; 
 
 public class PrintToken : BaseToken {
-    public override EStatus Accept(IVisitor visitor) {
+    public override string Accept(IVisitor visitor) {
         return visitor.Visit(this);
     }
 

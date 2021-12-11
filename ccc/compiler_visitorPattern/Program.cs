@@ -4,15 +4,17 @@ using System.IO;
 using System.Linq;
 using compiler_visitorPattern.tokens;
 
-namespace compiler_visitorPattern; 
+namespace compiler_visitorPattern;
 
 internal static class Program {
     private static void Main() {
-        var words = File.ReadAllText("../../../files/level4/level4_5.in").Replace("\r", "")
+        var words = File.ReadAllText("../../../files/level5/level5_example.in").Replace("\r", "")
             .Split(' ', '\n');
 
         var token = CreateTokenTree(words);
 
+        dynamic a;
+        
         var tokenVisitor = new TokenVisitor();
         // Visit the tree with visitor
         token.Accept(tokenVisitor);
@@ -21,31 +23,31 @@ internal static class Program {
     }
 
     private static BaseToken CreateTokenTree(IReadOnlyList<string> words) {
-        BaseToken currentToken = new RootToken(null);
+        BaseToken currentContextToken = new RootToken(null);
+        BaseToken lastToken = currentContextToken;
 
-        var result = currentToken;
+        var result = currentContextToken;
 
 
         for (var i = 1; i < words.Count; i++) {
             switch (words[i]) {
                 case "start":
-                    currentToken.Children.Add(currentToken =
-                        new StartToken(currentToken));
+                    currentContextToken.Children.Add(currentContextToken = lastToken =
+                        new StartToken(currentContextToken));
                     break;
                 case "print":
-                    currentToken.Children.Add(new PrintToken(words[i + 1], currentToken));
+                    currentContextToken.Children.Add(lastToken = new PrintToken(words[i + 1], currentContextToken));
                     break;
                 case "if":
-                    currentToken.Children.Add(currentToken =
-                        new IfToken(words[i + 1], currentToken, new List<BaseToken>()));
+                    currentContextToken.Children.Add(currentContextToken = lastToken =
+                        new IfToken(words[i + 1], currentContextToken, new List<BaseToken>()));
                     break;
                 case "else":
-                    if (currentToken.Children.Last() is IfToken) {
-                        var ifToken = (IfToken)currentToken.Children[^1];
+                    if (currentContextToken.Children.Last() is IfToken ifToken) {
                         var elseToken = new ElseToken(ifToken.ParentToken);
-                        currentToken.Children[^1] = new IfToken(ifToken.Value, ifToken.ParentToken,
+                        currentContextToken.Children[^1] = new IfToken(ifToken.Value, ifToken.ParentToken,
                             ifToken.Children, elseToken);
-                        currentToken = elseToken;
+                        currentContextToken = elseToken;
                     }
                     else {
                         Console.WriteLine("NO IF BEFORE ELSE");
@@ -53,19 +55,32 @@ internal static class Program {
 
                     break;
                 case "postpone":
-                    currentToken.Children.Add(currentToken = new PostponeToken(currentToken));
+                    currentContextToken.Children.Add(currentContextToken = new PostponeToken(currentContextToken));
                     break;
                 case "return":
-                    currentToken.Children.Add(new ReturnToken(words[i + 1], currentToken));
+                    currentContextToken.Children.Add(new ReturnToken(words[i + 1], currentContextToken));
                     break;
                 case "var":
-                    currentToken.Children.Add(new VarToken(words[i + 1], words[i + 2], currentToken));
+                    currentContextToken.Children.Add(new VarToken(words[i + 1], words[i + 2], currentContextToken));
                     break;
                 case "set":
-                    currentToken.Children.Add(new SetToken(words[i + 1], words[i + 2], currentToken));
+                    currentContextToken.Children.Add(new SetToken(words[i + 1], words[i + 2], currentContextToken));
                     break;
                 case "end":
-                    currentToken = currentToken.ParentToken;
+                    currentContextToken = currentContextToken.ParentToken;
+                    break;
+                case "call":
+                    if (lastToken.Value == null) {
+                        lastToken.Children.Add(lastToken = new CallToken(words[i + 1], currentContextToken));
+                    }
+                    else if (lastToken.Value.ToString() == "call") {
+                        lastToken.Value = (lastToken = new CallToken(words[i + 1], currentContextToken));
+                    }
+                    else {
+                        lastToken.Children.Add(lastToken = new CallToken(words[i + 1], currentContextToken));
+                    }
+
+
                     break;
             }
         }
