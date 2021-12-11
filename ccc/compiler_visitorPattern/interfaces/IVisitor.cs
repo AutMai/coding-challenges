@@ -6,7 +6,7 @@ namespace compiler_visitorPattern.interfaces;
 
 public interface IVisitor {
     string Visit(RootToken token);
-    string Visit(StartToken token);
+    string Visit(StartToken token, bool called = false);
     string Visit(IfToken token);
     string Visit(ElseToken token);
     string Visit(ReturnToken token);

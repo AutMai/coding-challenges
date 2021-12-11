@@ -1,8 +1,11 @@
-﻿namespace compiler_visitorPattern; 
+﻿using System;
 
-public interface IReturnValue {
-}
+namespace compiler_visitorPattern; 
 
-public class ReturnValue:IReturnValue {
-    public string Value { get; set; }
+public class ReturnException : Exception{
+    public string Value { get; }
+
+    public ReturnException(string value) {
+        Value = value;
+    }
 }

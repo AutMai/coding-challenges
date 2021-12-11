@@ -1,0 +1,9 @@
+6
+start
+print call 2
+end
+start
+print ja
+return returnvalue
+print nein
+end

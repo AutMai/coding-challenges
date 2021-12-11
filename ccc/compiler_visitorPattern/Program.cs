@@ -12,8 +12,6 @@ internal static class Program {
             .Split(' ', '\n');
 
         var token = CreateTokenTree(words);
-
-        dynamic a;
         
         var tokenVisitor = new TokenVisitor();
         // Visit the tree with visitor
@@ -27,8 +25,7 @@ internal static class Program {
         BaseToken lastToken = currentContextToken;
 
         var result = currentContextToken;
-
-
+        
         for (var i = 1; i < words.Count; i++) {
             switch (words[i]) {
                 case "start":
@@ -79,8 +76,6 @@ internal static class Program {
                     else {
                         lastToken.Children.Add(lastToken = new CallToken(words[i + 1], currentContextToken));
                     }
-
-
                     break;
             }
         }
