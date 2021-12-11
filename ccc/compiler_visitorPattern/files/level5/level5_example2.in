@@ -1,0 +1,13 @@
+12
+start
+print call call call call call 3
+end
+start
+call call 4
+end
+start
+return 3
+end
+start
+print noreturn
+end
