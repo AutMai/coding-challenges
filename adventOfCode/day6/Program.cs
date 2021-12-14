@@ -1,8 +1,8 @@
 ﻿using System.Threading.Channels;
+using aocTools;
 using day6;
 
-string input =
-    File.ReadAllText(@"C:\Users\Sebastian\OneDrive - Personal\OneDrive\coding\adventOfCode\day6\input.txt");
+string input = Helper.ReadFile("input.txt");
 // 3,4,3,1,2
 
 //List<Fish> fishList = new List<Fish>();

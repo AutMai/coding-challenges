@@ -1,8 +1,9 @@
-﻿using day13;
+﻿using System.Runtime.CompilerServices;
+using aocTools;
+using day13;
 
-var input = File
-    .ReadAllText(
-        @"C:\Users\Sebastian\OneDrive\coding\coding-challenges\adventOfCode\day13\input.txt")
+
+var input = Helper.ReadFile("input.txt")
     .Replace("\r", "");
 
 var foldInstructionList = input.Split("\n\n")[1].Replace("fold along ", "").Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList();

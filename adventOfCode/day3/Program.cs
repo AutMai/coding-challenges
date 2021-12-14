@@ -1,6 +1,7 @@
 ﻿using System.Threading.Channels;
+using aocTools;
 
-string input = System.IO.File.ReadAllText(@"C:\Users\Sebastian\OneDrive\coding\adventOfCode\day3\input.txt");
+string input = Helper.ReadFile("input.txt");
 var binaryNums = input.Split("\n");
 binaryNums = binaryNums.SkipLast(1).ToArray();
 

@@ -1,7 +1,7 @@
-﻿using day5;
+﻿using aocTools;
+using day5;
 
-string input =
-    File.ReadAllText(@"C:\Users\Sebastian\OneDrive - Personal\OneDrive\coding\adventOfCode\day5\input.txt");
+string input = Helper.ReadFile("input.txt");
 
 Dictionary<Point, Point> lines = new Dictionary<Point, Point>();
 

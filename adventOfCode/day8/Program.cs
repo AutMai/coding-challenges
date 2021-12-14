@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using aocTools;
 
-string input = File.ReadAllText(@"C:\Users\Sebastian\OneDrive - Personal\OneDrive\coding\adventOfCode\day8\input.txt");
+string input = Helper.ReadFile("input.txt");
 
 var x = input.Split('\n');
 

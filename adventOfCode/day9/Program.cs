@@ -1,4 +1,6 @@
-﻿var inputLines = File.ReadAllText(@"C:\Users\Sebastian\OneDrive - Personal\OneDrive\coding\adventOfCode\day9\input.txt")
+﻿using aocTools;
+
+var inputLines = Helper.ReadFile("input.txt")
     .Replace("\r", "")
     .Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
@@ -48,7 +50,7 @@ List<int> FindLowPoints() {
 }
 
 /*
-var inputLines = File.ReadAllText(@"C:\Users\Sebastian\OneDrive - Personal\OneDrive\coding\adventOfCode\day9\input.txt").Replace("\r", "")
+var inputLines = Helper.ReadFile("input.txt")
     .Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
 var caveMap = new int[inputLines[0].Length, inputLines.Length];

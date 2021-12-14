@@ -1,4 +1,6 @@
-﻿string input = File.ReadAllText(@"C:\Users\Sebastian\OneDrive - Personal\OneDrive\coding\adventOfCode\day7\input.txt");
+﻿using aocTools;
+
+string input = Helper.ReadFile("input.txt");
 
 var crabs1 = input.Split(',');
 

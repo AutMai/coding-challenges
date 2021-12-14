@@ -1,6 +1,7 @@
 ﻿using System.Threading.Channels;
+using aocTools;
 
-string input = File.ReadAllText(@"C:\Users\Sebastian\OneDrive\coding\adventOfCode\day2\input.txt");
+string input = Helper.ReadFile("input.txt");
 var inputAr = input.Split("\n");
 inputAr = inputAr.SkipLast(1).ToArray();
 

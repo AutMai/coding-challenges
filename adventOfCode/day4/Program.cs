@@ -1,11 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using aocTools;
 using day4;
 
 List<BingoNumber[,]> bingoBoardList = new List<BingoNumber[,]>();
 
 
-string input =
-    File.ReadAllText(@"C:\Users\Sebastian\OneDrive - Personal\OneDrive\coding\adventOfCode\day4\input.txt")[..^2];
+string input = Helper.ReadFile("input.txt")[..^2];
 
 var bingoInput = input.Split("\n")[0].Split(',');
 var bingoInputInt = Array.ConvertAll(bingoInput, Convert.ToInt32);
