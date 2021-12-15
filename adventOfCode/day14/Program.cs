@@ -2,9 +2,11 @@
 using aocTools;
 using day14;
 
-var input = Helper.ReadFile("input.txt").Split("\n\n")[0];
+const string fileName = "input_small.txt";
 
-var operationsString = Helper.ReadFile("input.txt").Split("\n\n")[1].Split('\n');
+var input = Helper.ReadFile(fileName).Split("\n\n")[0];
+
+var operationsString = Helper.ReadFile(fileName).Split("\n\n")[1].Split('\n');
 
 Polymer.CreateOperations(operationsString);
 Polymer.ReadPolymers(input);
