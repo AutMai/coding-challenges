@@ -1,64 +1,92 @@
 ﻿using aocTools;
+using day21;
 
 // Player 1 starting position: 8
 // Player 2 starting position: 6
 
-var p1Score = 0;
-var p2Score = 0;
 
-var p1Pos = 8;
-var p2Pos = 6;
+Dictionary<int, ulong> PossibleRollOutComes = new Dictionary<int, ulong>();
+ulong player1Victories = 0;
+ulong player2Victories = 0;
 
-List<int> gameBoard = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+Solve();
 
-var diceSide = 0;
-int diceRolls = 0;
-bool p1 = true;
-while (true) {
-    diceRolls += 3;
-
-    var roll = Roll() + Roll() + Roll();
-
-    MovePlayer(roll);
-    p1 = !p1;
-    if (p1Score >= 1000) {
-        Console.WriteLine((p2Score * diceRolls));
-        return;
-    }
-
-    if (p2Score >= 1000) {
-        Console.WriteLine((p1Score * diceRolls));
-        return;
-    }
+void Solve() {
+    Part2();
 }
 
-
-int Roll() {
-    if (diceSide != 100)
-        diceSide++;
-    else
-        diceSide = 1;
-
-    return diceSide;
-}
-
-void MovePlayer(int steps) {
-    if (p1) {
-        if (((p1Pos + steps) % 10) == 0) {
-            p1Pos = 10;
-            p1Score += 10;
+void Part2() {
+    for (int x = 1; x <= 3; x++) {
+        for (int y = 1; y <= 3; y++) {
+            for (int z = 1; z <= 3; z++) {
+                int total = x + y + z;
+                if (!PossibleRollOutComes.ContainsKey(total)) {
+                    PossibleRollOutComes.Add(total, 1);
+                }
+                else {
+                    PossibleRollOutComes[total] += 1;
+                }
+            }
         }
-        else {
-            p1Score += (p1Pos = ((p1Pos + steps) % 10));
+    }
+
+
+    RollDiracDie(0, 0, 8, 6, 1, 1);
+
+    if (player1Victories > player2Victories) {
+        Console.WriteLine(player1Victories);
+    }
+    else {
+        Console.WriteLine(player2Victories);
+    }
+}
+
+ void RollDiracDie(int player1Points, int player2Points, int player1Pos, int player2Pos, int playerTurn,
+    ulong universes) {
+    if (player1Points > 21 || player2Points > 21) {
+        return;
+    }
+
+    if (playerTurn == 1) {
+        foreach (KeyValuePair<int, ulong> kvp in PossibleRollOutComes) {
+            int pts = MoveSpaces(kvp.Key, player1Pos);
+            if (player1Points + pts < 21) {
+                RollDiracDie(player1Points + pts, player2Points, pts, player2Pos, 2, (kvp.Value * universes));
+            }
+            else {
+                player1Victories += universes * kvp.Value;
+            }
         }
     }
     else {
-        if (((p2Pos + steps) % 10) == 0) {
-            p2Pos = 10;
-            p2Score += 10;
-        }
-        else {
-            p2Score += (p2Pos = ((p2Pos + steps) % 10));
+        foreach (KeyValuePair<int, ulong> kvp in PossibleRollOutComes) {
+            int pts = MoveSpaces(kvp.Key, player2Pos);
+            if (player2Points + pts < 21) {
+                RollDiracDie(player1Points, player2Points + pts, player1Pos, pts, 1, (kvp.Value * universes));
+            }
+            else {
+                player2Victories += universes * kvp.Value;
+            }
         }
     }
+}
+
+ int MoveSpaces(int numSpaces, int currentSpace) {
+    int spaceLandOn = 0;
+    int toAdd = 0;
+    if (numSpaces > 10) {
+        toAdd = numSpaces % 10;
+    }
+    else {
+        toAdd = numSpaces;
+    }
+
+    if (currentSpace + toAdd > 10) {
+        spaceLandOn = (currentSpace + toAdd) % 10;
+    }
+    else {
+        spaceLandOn = currentSpace + toAdd;
+    }
+
+    return spaceLandOn;
 }
