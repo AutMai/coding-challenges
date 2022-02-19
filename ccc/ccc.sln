@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "compiler_visitorPattern", "compiler_visitorPattern\compiler_visitorPattern.csproj", "{45B5F4AA-5A6E-41C3-9F22-34865471529F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ccc_35_classic_compiler", "ccc_35_classic_compiler\ccc_35_classic_compiler.csproj", "{45B5F4AA-5A6E-41C3-9F22-34865471529F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
