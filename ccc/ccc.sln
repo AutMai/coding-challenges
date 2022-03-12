@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ccc_35_classic_compiler", "ccc_35_classic_compiler\ccc_35_classic_compiler.csproj", "{45B5F4AA-5A6E-41C3-9F22-34865471529F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ccc_34_classic_smartgrid", "ccc_34_classic_smartgrid\ccc_34_classic_smartgrid.csproj", "{C96DD117-64D0-4C88-BFA3-63D872ED9591}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingHelper", "CodingHelper\CodingHelper.csproj", "{2292875D-12C1-477D-B809-2B864B3753F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{45B5F4AA-5A6E-41C3-9F22-34865471529F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45B5F4AA-5A6E-41C3-9F22-34865471529F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45B5F4AA-5A6E-41C3-9F22-34865471529F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C96DD117-64D0-4C88-BFA3-63D872ED9591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C96DD117-64D0-4C88-BFA3-63D872ED9591}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C96DD117-64D0-4C88-BFA3-63D872ED9591}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C96DD117-64D0-4C88-BFA3-63D872ED9591}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2292875D-12C1-477D-B809-2B864B3753F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2292875D-12C1-477D-B809-2B864B3753F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2292875D-12C1-477D-B809-2B864B3753F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2292875D-12C1-477D-B809-2B864B3753F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
