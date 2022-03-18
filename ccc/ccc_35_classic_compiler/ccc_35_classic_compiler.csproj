@@ -4,7 +4,7 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>10</LangVersion>
-        <RootNamespace>compiler_visitorPattern</RootNamespace>
+        <RootNamespace>ccc_35_classic_compiler</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
