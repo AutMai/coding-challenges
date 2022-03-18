@@ -12,27 +12,19 @@ public class TokenVisitor : IVisitor {
     private readonly StringBuilder _functionOutputBuilder = new();
 
     public string Output => _result.ToString();
-
-    public string Output2 => _functionOutputBuilder.ToString();
-
-    public string Visit(RootToken token) {
-        return VisitChildren(token.Children);
+    
+    public void Visit(RootToken token) {
+        VisitChildren(token.Children);
     }
 
     public string Visit(StartToken token, bool called = false) {
         try {
-            var returnValue = VisitChildren(token.Children);
-            if (called == false) {
-                _result.Append(_functionOutputBuilder);
-                _result.Append('\n');
-                _functionOutputBuilder.Clear();
-            }
-
-            return returnValue;
+            VisitChildren(token.Children);
         }
         catch (ReturnException re) {
             _result.Append(_functionOutputBuilder);
-            if (called == false) _result.Append('\n');
+            if (called == false) 
+                _result.Append('\n');
             _functionOutputBuilder.Clear();
             return re.Value;
         }
@@ -40,63 +32,64 @@ public class TokenVisitor : IVisitor {
             _result.Append("ERROR");
             _result.Append('\n');
             _functionOutputBuilder.Clear();
-            return e.Message;
         }
+
+        if (called) return "";
+        _result.Append(_functionOutputBuilder);
+        _result.Append('\n');
+        _functionOutputBuilder.Clear();
+
+        return "";
     }
 
-    private string VisitChildren(IReadOnlyList<BaseToken> children, int startIndex = 0) {
+    private void VisitChildren(IReadOnlyList<BaseToken> children, int startIndex = 0) {
         for (var i = startIndex; i < children.Count; i++) {
-            var returnValue = children[i].Accept(this);
-            if (returnValue != "" && children[i] is ReturnToken) return returnValue;
+            children[i].Accept(this);
         }
-
-        return "true";
     }
 
-    public string Visit(IfToken token) => EvaluateValue(token) is not bool expressionBool
-        ? throw new Exception("ValueError")
-        : VisitChildren(expressionBool ? token.Children : token.ElseToken.Children);
+    public void Visit(IfToken token) {
+        if (EvaluateValue(token) is not bool expressionBool)
+            throw new Exception("ValueError");
+        
+        VisitChildren(expressionBool ? token.Children : token.ElseToken.Children);
+    }
 
 
-    public string Visit(ElseToken token) => VisitChildren(token.Children);
+    public void Visit(ElseToken token) => VisitChildren(token.Children);
 
-    public string Visit(ReturnToken token) {
+    public void Visit(ReturnToken token) {
         var value = EvaluateValue(token);
         if (value is bool) value = value.ToString()?.ToLower();
         throw new ReturnException(value.ToString());
     }
 
-    public string Visit(PrintToken token) {
+    public void Visit(PrintToken token) {
         var value = EvaluateValue(token);
 
-        value = value is bool ? value.ToString()?.ToLower() : value.ToString();
+        value = value is bool ? value.ToString()?.ToLower() : value.ToString(); // write true and false in lowercase
         _functionOutputBuilder.Append(value);
-        return "";
     }
 
-    public string Visit(VarToken token) {
-        var startToken = (StartToken)token.GetFunctionToken();
+    public void Visit(VarToken token) {
+        var startToken = (StartToken) token.GetFunctionToken();
         if (startToken.Variables.Exists(v => v.Name == token.Name)) {
-            throw new Exception("UnknownVariable");
+            throw new Exception("VariableAlreadyExists");
         }
 
-        var value = EvaluateValue(token);
-        startToken.Variables.Add(new Variable { Name = token.Name, Value = value });
-        return "";
+        startToken.Variables.Add(new Variable {Name = token.Name, Value = EvaluateValue(token)});
     }
 
-    public string Visit(SetToken token) {
-        var startToken = (StartToken)token.GetFunctionToken();
+    public void Visit(SetToken token) {
+        var startToken = (StartToken) token.GetFunctionToken();
         var variable = startToken.Variables.SingleOrDefault(v => v.Name == token.Name);
         if (variable == null) throw new Exception("UnknownVariable");
         var value = EvaluateValue(token);
         variable.Value = value;
-        return "";
     }
 
-    public string Visit(PostponeToken token) {
-        AppendTokens(token.ParentToken, token.Children);
-        return "";
+    public void Visit(PostponeToken token) {
+        token.ParentToken.AddChildren(token.Children);
     }
 
     public string Visit(CallToken token) {
@@ -106,26 +99,21 @@ public class TokenVisitor : IVisitor {
         }
 
         var functionToken = token.GetRootToken().Children[Convert.ToInt32(value) - 1];
-        return Visit((StartToken)functionToken, true);
-    }
-
-    private void AppendTokens(BaseToken parentToken, List<BaseToken> childTokens) {
-        childTokens.ForEach(t => t.ParentToken = parentToken);
-        parentToken.Children.AddRange(childTokens);
+        return Visit((StartToken) functionToken, true);
     }
 
     private object EvaluateValue(BaseToken token) {
         var value = token.Value;
-        var startToken = (StartToken)token.GetFunctionToken();
+        var startToken = (StartToken) token.GetFunctionToken();
 
 
         if (startToken.Variables.Exists(v => v.Name == value.ToString()))
-            return startToken.Variables.SingleOrDefault(v => v.Name == (string)value)?.Value;
+            return startToken.Variables.SingleOrDefault(v => v.Name == (string) value)?.Value;
         if (int.TryParse(value.ToString(), out _))
             return Convert.ToInt32(value);
 
         if (value is CallToken callToken) {
-            value = callToken.Accept(this);
+            value = Visit(callToken);
         }
 
         switch (value) {

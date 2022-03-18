@@ -1,5 +1,5 @@
 ﻿namespace compiler_visitorPattern.interfaces; 
 
 public interface IVisitable {
-    string Accept(IVisitor visitor);
+    void Accept(IVisitor visitor);
 }

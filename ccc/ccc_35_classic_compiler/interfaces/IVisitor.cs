@@ -5,14 +5,14 @@ using compiler_visitorPattern.tokens;
 namespace compiler_visitorPattern.interfaces; 
 
 public interface IVisitor {
-    string Visit(RootToken token);
+    void Visit(RootToken token);
     string Visit(StartToken token, bool called = false);
-    string Visit(IfToken token);
-    string Visit(ElseToken token);
-    string Visit(ReturnToken token);
-    string Visit(PrintToken token);
-    string Visit(VarToken token);
-    string Visit(SetToken token);
-    string Visit(PostponeToken token);
+    void Visit(IfToken token);
+    void Visit(ElseToken token);
+    void Visit(ReturnToken token);
+    void Visit(PrintToken token);
+    void Visit(VarToken token);
+    void Visit(SetToken token);
+    void Visit(PostponeToken token);
     string Visit(CallToken token);
 }

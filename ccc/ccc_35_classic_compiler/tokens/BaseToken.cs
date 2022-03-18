@@ -31,10 +31,15 @@ public abstract class BaseToken : IVisitable {
         token = token.ParentToken.GetFunctionToken();
         return token;
     }
+    
+    public void AddChildren(List<BaseToken> childTokens) {
+        childTokens.ForEach(t => t.ParentToken = this);
+        this.Children.AddRange(childTokens);
+    }
 
     public BaseToken ParentToken { get; set; }
 
     public List<BaseToken> Children { get; protected init; } = new();
-    public abstract string Accept(IVisitor visitor);
+    public abstract void Accept(IVisitor visitor);
     
 }

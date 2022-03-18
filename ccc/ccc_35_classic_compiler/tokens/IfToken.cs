@@ -7,8 +7,8 @@ public class IfToken : BaseToken {
     public ElseToken ElseToken { get; }
 
 
-    public override string Accept(IVisitor visitor) {
-        return visitor.Visit(this);
+    public override void Accept(IVisitor visitor) {
+        visitor.Visit(this);
     }
 
     public IfToken(object value, BaseToken parentToken, List<BaseToken> children = null,
