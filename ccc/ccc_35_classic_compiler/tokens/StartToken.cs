@@ -4,7 +4,7 @@ using compiler_visitorPattern.interfaces;
 namespace compiler_visitorPattern.tokens; 
 
 public class StartToken : BaseToken {
-    public readonly List<Variable> Variables = new();
+    public List<Variable> Variables = new();
 
     public override void Accept(IVisitor visitor) {
         visitor.Visit(this);

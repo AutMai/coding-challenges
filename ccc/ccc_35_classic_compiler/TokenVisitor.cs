@@ -54,10 +54,7 @@ public class TokenVisitor : IVisitor {
         
         VisitChildren(expressionBool ? token.Children : token.ElseToken.Children);
     }
-
-
-    public void Visit(ElseToken token) => VisitChildren(token.Children);
-
+    
     public void Visit(ReturnToken token) {
         var value = EvaluateValue(token);
         if (value is bool) value = value.ToString()?.ToLower();
@@ -98,8 +95,26 @@ public class TokenVisitor : IVisitor {
             throw new Exception("ValueError");
         }
 
-        var functionToken = token.GetRootToken().Children[Convert.ToInt32(value) - 1];
-        return Visit((StartToken) functionToken, true);
+        var functionTokenToCall = (StartToken) token.GetRootToken().Children[Convert.ToInt32(value) - 1];
+        var variablesBefore = new List<Variable>(functionTokenToCall.Variables);
+        functionTokenToCall.Variables.AddRange(((StartToken) token.GetFunctionToken()).Variables);
+        var returnValue = Visit(functionTokenToCall, true);
+        functionTokenToCall.Variables = variablesBefore;
+
+        return returnValue;
+    }
+
+    public void Visit(TryToken token) {
+        try {
+            VisitChildren(token.Children);
+        }
+        catch (Exception e) {
+            VisitChildren(token.CatchToken.Children);
+        }
+    }
+
+    public string Visit(CatchToken token) {
+        throw new NotImplementedException();
     }
 
     private object EvaluateValue(BaseToken token) {

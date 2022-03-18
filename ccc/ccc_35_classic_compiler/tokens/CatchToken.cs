@@ -2,10 +2,9 @@
 
 namespace compiler_visitorPattern.tokens; 
 
-public class ElseToken : BaseToken {
+public class CatchToken : BaseToken {
 
-
-    public ElseToken(BaseToken parentToken) : base(parentToken) {
+    public CatchToken(BaseToken parentToken) : base(parentToken) {
     }
 
     public override void Accept(IVisitor visitor) {

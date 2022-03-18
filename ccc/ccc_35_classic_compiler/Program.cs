@@ -8,11 +8,11 @@ namespace compiler_visitorPattern;
 
 internal static class Program {
     private static void Main() {
-        var words = File.ReadAllText("../../../files/level5/level5_example.in").Replace("\r", "")
+        var words = File.ReadAllText("../../../files/level6/level6_example.in").Replace("\r", "")
             .Split(' ', '\n');
 
         var token = CreateTokenTree(words);
-        
+
         var tokenVisitor = new TokenVisitor();
         // Visit the tree with visitor
         token.Accept(tokenVisitor);
@@ -25,7 +25,7 @@ internal static class Program {
         BaseToken lastToken = currentContextToken;
 
         var result = currentContextToken;
-        
+
         for (var i = 1; i < words.Count; i++) {
             switch (words[i]) {
                 case "start":
@@ -76,6 +76,21 @@ internal static class Program {
                     else {
                         lastToken.Children.Add(lastToken = new CallToken(words[i + 1], currentContextToken));
                     }
+
+                    break;
+                case "try":
+                    currentContextToken.Children.Add(currentContextToken = lastToken =
+                        new TryToken(currentContextToken, new List<BaseToken>()));
+                    break;
+                case "catch":
+                    if (currentContextToken.Children.Last() is TryToken tryToken) {
+                        var catchToken = new CatchToken(tryToken.ParentToken);
+                        currentContextToken.Children[^1] = new TryToken(tryToken.ParentToken,
+                            tryToken.Children, catchToken);
+                        currentContextToken = catchToken;
+                    }
+                    else Console.WriteLine("NO TRY BEFORE CATCH");
+
                     break;
             }
         }

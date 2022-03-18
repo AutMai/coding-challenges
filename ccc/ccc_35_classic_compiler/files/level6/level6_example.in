@@ -1,0 +1,14 @@
+﻿13
+start
+var variable value
+call 2
+end
+start
+try
+print something
+var variable newvalue
+end
+catch
+print variablealreadyinitialised
+end
+end
