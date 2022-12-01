@@ -54,7 +54,7 @@ foreach (var eco in economists) {
 #endregion
 
 #region Level3
-var input = File.ReadAllText($"../../../files/level2/level2_example.in").Replace("\r", "").Split('\n').ToList();
+/*var input = File.ReadAllText($"../../../files/level2/level2_example.in").Replace("\r", "").Split('\n').ToList();
 
 var economistCount = input.TakeAndRemove(1);
 
@@ -77,5 +77,5 @@ foreach (var eco in economists) {
     Console.WriteLine(otherMaxSweet > ownMinSweet
         ? $"{eco.Id} {ownMinSweet} {sweets.First(s => s.Value == otherMaxSweet).Economist.Id} {otherMaxSweet}"
         : "NO TRADE");
-}
+}*/
 #endregion

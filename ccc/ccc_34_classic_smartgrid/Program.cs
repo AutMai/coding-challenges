@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using CodingHelper;
 
+Console.WriteLine("asda");
+
 #region Level1
 
 /*
@@ -54,7 +56,7 @@ for (int l = 1; l <= 5; l++) {
 
 
 #region Level3
-
+/*
 for (int l = 1; l <= 5; l++) {  
     var output = new StringBuilder();
 
@@ -78,5 +80,5 @@ for (int l = 1; l <= 5; l++) {
 
     File.WriteAllText($"../../../files/level3/level3_{l}.out", output.ToString());
 }
-
+*/
 #endregion

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using compiler_visitorPattern.interfaces;
-using compiler_visitorPattern.tokens;
+using ccc_35_classic_compiler.interfaces;
+using ccc_35_classic_compiler.tokens;
 
-namespace compiler_visitorPattern;
+namespace ccc_35_classic_compiler;
 
 public class TokenVisitor : IVisitor {
     private readonly StringBuilder _result = new();

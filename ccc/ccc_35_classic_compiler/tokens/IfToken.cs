@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using compiler_visitorPattern.interfaces;
+using ccc_35_classic_compiler.interfaces;
 
-namespace compiler_visitorPattern.tokens; 
+namespace ccc_35_classic_compiler.tokens; 
 
 public class IfToken : BaseToken {
     public ElseToken ElseToken { get; }

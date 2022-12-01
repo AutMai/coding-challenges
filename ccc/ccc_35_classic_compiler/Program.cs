@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using compiler_visitorPattern.tokens;
+using ccc_35_classic_compiler.tokens;
 
-namespace compiler_visitorPattern;
+namespace ccc_35_classic_compiler;
 
 internal static class Program {
     private static void Main() {

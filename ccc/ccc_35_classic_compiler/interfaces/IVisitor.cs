@@ -1,8 +1,6 @@
-﻿
+﻿using ccc_35_classic_compiler.tokens;
 
-using compiler_visitorPattern.tokens;
-
-namespace compiler_visitorPattern.interfaces; 
+namespace ccc_35_classic_compiler.interfaces; 
 
 public interface IVisitor {
     void Visit(RootToken token);
