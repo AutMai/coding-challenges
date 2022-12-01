@@ -6,4 +6,7 @@ public static class Extensions {
     public static string CutFromBeginning(this string @this, int length) => @this.Substring(length);
     public static string GetFromBeginning(this string @this, int length) => @this.Substring(0, length);
     public static int ToInt(this char @this) => Convert.ToInt32(@this.ToString());
+    
+    public static TokenList ToTokenList(this List<string> @this) => new TokenList(@this);
+    public static List<string> RemoveEmptyTokens(this List<string> @this) => @this.Where(x => !string.IsNullOrEmpty(x)).ToList();
 }

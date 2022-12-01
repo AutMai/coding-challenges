@@ -8,6 +8,7 @@ public static class Helper {
         .Replace("\r", "");
 
 
-    public static IEnumerable<string> ReadLines(string filename) =>
-        File.ReadLines(Path.Combine(Directory.GetParent(WorkingDirectory).Parent.Parent.FullName, filename));
+    public static List<string> ReadLines(string filename) =>
+        File.ReadLines(Path.Combine(Directory.GetParent(WorkingDirectory).Parent.Parent.FullName, filename)).ToList();
+    
 }
