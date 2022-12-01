@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "painter", "painter\painter.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "silly_substitutions", "silly_substitutions\silly_substitutions.csproj", "{414915E9-B908-4692-AB63-7621C6D84FF6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "record_breaker", "record_breaker\record_breaker.csproj", "{ADC5C735-9DA1-41A3-B2B1-A0A2711AF4BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{414915E9-B908-4692-AB63-7621C6D84FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{414915E9-B908-4692-AB63-7621C6D84FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{414915E9-B908-4692-AB63-7621C6D84FF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADC5C735-9DA1-41A3-B2B1-A0A2711AF4BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADC5C735-9DA1-41A3-B2B1-A0A2711AF4BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADC5C735-9DA1-41A3-B2B1-A0A2711AF4BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADC5C735-9DA1-41A3-B2B1-A0A2711AF4BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
