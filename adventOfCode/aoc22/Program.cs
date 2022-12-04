@@ -1,5 +1,5 @@
-﻿using aoc22.day3;
+﻿using aoc22.day4;
 
-var day = new Day3();
+var day = new Day4();
 day.PuzzleOne();
 day.PuzzleTwo();
