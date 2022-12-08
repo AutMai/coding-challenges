@@ -2,7 +2,7 @@
 
 public abstract class AAocDay : IAocDay {
     protected TokenList InputTokens { get; set; }
-    private TokenList _originalInputTokens;
+    protected readonly TokenList OriginalInputTokens;
     public abstract void PuzzleOne();
 
     public abstract void PuzzleTwo();
@@ -17,10 +17,10 @@ public abstract class AAocDay : IAocDay {
                 .ToList().ToTokenList();
         }
 
-        _originalInputTokens = new TokenList(InputTokens);
+        OriginalInputTokens = new TokenList(InputTokens);
     }
     
     protected void ResetInput() {
-        InputTokens = new TokenList(_originalInputTokens);
+        InputTokens = new TokenList(OriginalInputTokens);
     }
 }
