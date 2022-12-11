@@ -9,4 +9,37 @@ public static class Extensions {
     
     public static TokenList ToTokenList(this List<string> @this) => new TokenList(@this);
     public static List<string> RemoveEmptyTokens(this List<string> @this) => @this.Where(x => !string.IsNullOrEmpty(x)).ToList();
+    
+    public static int Kgv(int a, int b)
+    {
+        return (a / Ggt(a, b)) * b;
+    }
+    
+    public static int Ggt(int a, int b)
+    {
+        while (b != 0)
+        {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+    
+    static int gcd(int n1, int n2)
+    {
+        if (n2 == 0)
+        {
+            return n1;
+        }
+        else
+        {
+            return gcd(n2, n1 % n2);
+        }
+    }
+
+    public static int lcm(int[] numbers)
+    {
+        return numbers.Aggregate((S, val) => S * val / gcd(S, val));
+    }
 }
