@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Neo4j.Driver.Simple" Version="5.3.0" />
+    </ItemGroup>
+
 </Project>
