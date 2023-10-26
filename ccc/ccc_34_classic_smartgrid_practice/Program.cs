@@ -6,7 +6,7 @@ var r = new InputReader();
 r.ReadZipFile("files/level6.zip");
 
 foreach (var level in r.GetInputs()) {
-    level.SetOutput();
+    level.SetOutputToFile();
     var maxPowerPerMinute = level.Read().ToInt32();
     var maxBill = level.Read().ToInt64();
     var maxTasksPerMinute = level.Read().ToInt64();

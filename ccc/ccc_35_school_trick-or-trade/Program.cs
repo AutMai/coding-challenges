@@ -79,3 +79,6 @@ foreach (var eco in economists) {
         : "NO TRADE");
 }*/
 #endregion
+
+
+Console.WriteLine();

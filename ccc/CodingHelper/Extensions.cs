@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using System.Text;
 
 namespace CodingHelper;
 
@@ -29,7 +30,7 @@ public class InputReader {
     }
 
     //list einen file ein und splittet nach splitValue
-    public void ReadWholeFile(string fileName, string splitValue = " ", bool lines= false) {
+    public void ReadWholeFile(string fileName, string splitValue = " ", bool lines = false) {
         List<string> input = new();
         if (lines) {
             input = File.ReadAllLines(GetCompletePath(fileName)).ToList();
@@ -111,7 +112,7 @@ public class Input {
     public string FileName { get; set; }
 
     //speichert alle console.writeline outputs in ein file
-    public void SetOutput() {
+    public void SetOutputToFile() {
         FileStream filestream = new FileStream(
             GetOutputPath("outputs/" + FileName),
             FileMode.Create);
@@ -119,6 +120,44 @@ public class Input {
         streamwriter.AutoFlush = true;
         Console.SetOut(streamwriter);
     }
+
+    public void SetOutput() {
+        FileStream filestream = new FileStream(GetOutputPath("outputs/" + FileName), FileMode.Create);
+        StreamWriter filewriter = new StreamWriter(filestream);
+        filewriter.AutoFlush = true;
+
+        // Create a new StreamWriter instance that writes to the console's standard output stream.
+        StreamWriter consolewriter = new StreamWriter(Console.OpenStandardOutput());
+        consolewriter.AutoFlush = true;
+
+        // Combine the two writers into a single StreamWriter that will write to both the file and the console.
+        var combinedwriter = new CombinedWriter(filewriter, consolewriter);
+
+        Console.SetOut(combinedwriter);
+    }
+
+    public class CombinedWriter : TextWriter {
+        private readonly List<TextWriter> writers;
+
+        public CombinedWriter(params TextWriter[] writers) {
+            this.writers = new List<TextWriter>(writers);
+        }
+
+        public override void Write(char value) {
+            foreach (var writer in writers) {
+                writer.Write(value);
+            }
+        }
+
+        public override void Write(string value) {
+            foreach (var writer in writers) {
+                writer.Write(value);
+            }
+        }
+
+        public override Encoding Encoding => Encoding.UTF8;
+    }
+
 
     public Input(string fileName, List<string> inputs) {
         FileName = fileName;
@@ -128,7 +167,7 @@ public class Input {
 
     private string GetOutputPath(string fileName) {
         var path = fileName.Replace(".in", "")
-            .Split(new string[] {"/", "\\"}, StringSplitOptions.RemoveEmptyEntries);
+            .Split(new string[] { "/", "\\" }, StringSplitOptions.RemoveEmptyEntries);
         path[^2] += "Output";
         Directory.CreateDirectory(InputReader.GetCompletePath(path[^2]));
         return "../../../" + path[^2] + "/" + path[^1] + ".out";
@@ -186,6 +225,32 @@ public class Input {
 }
 
 public static class Extension {
+    
+    public static IEnumerable<IList<TSource>> Split<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+    {
+        var list = new List<TSource>();
+
+        foreach (var element in source)
+        {
+            if (predicate(element))
+            {
+                if (list.Count > 0)
+                {
+                    yield return list;
+                    list = new List<TSource>();
+                }
+            }
+            else
+            {
+                list.Add(element);
+            }
+        }
+
+        if (list.Count > 0)
+        {
+            yield return list;
+        }
+    }
     public static T Pop<T>(this List<T> list) {
         var item = list[0];
         list.RemoveAt(0);
@@ -199,7 +264,7 @@ public static class Extension {
     }
 
 
-    public static List<Node> ToNeighbors(this Node[][] array) {
+    /*public static List<Node> ToNeighbors(this Node[][] array) {
         var nodes = new List<Node>();
 
         for (int y = 0; y < array.Length; y++) {
@@ -219,7 +284,7 @@ public static class Extension {
         }
 
         return nodes;
-    }
+    }*/
 
     public static List<Node> ToNeighborsFull(this Node[][] array) {
         var nodes = new List<Node>();
@@ -231,14 +296,14 @@ public static class Extension {
                 var top = (y - 1 >= 0);
                 var bottom = (y + 1 < array.Length);
 
-                if (left) array[y][x].Neighbors.Add(array[y][x - 1]);
-                if (right) array[y][x].Neighbors.Add(array[y][x + 1]);
-                if (top) array[y][x].Neighbors.Add(array[y - 1][x]);
-                if (bottom) array[y][x].Neighbors.Add(array[y + 1][x]);
-                if (left && top) array[y][x].Neighbors.Add(array[y - 1][x - 1]);
-                if (right && top) array[y][x].Neighbors.Add(array[y - 1][x + 1]);
-                if (left && bottom) array[y][x].Neighbors.Add(array[y + 1][x - 1]);
-                if (right && bottom) array[y][x].Neighbors.Add(array[y + 1][x + 1]);
+                if (left) array[y][x].Neighbors.Add(new Connection(array[y][x - 1], EDirection.Left));
+                if (right) array[y][x].Neighbors.Add(new Connection(array[y][x + 1], EDirection.Right));
+                if (top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x], EDirection.Up));
+                if (bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x], EDirection.Down));
+                if (left && top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x - 1], EDirection.LeftUp));
+                if (right && top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x + 1], EDirection.RightUp));
+                if (left && bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x - 1], EDirection.LeftDown));
+                if (right && bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x + 1], EDirection.RightDown));
 
                 nodes.Add(array[y][x]);
             }
@@ -246,6 +311,7 @@ public static class Extension {
 
         return nodes;
     }
+
 
     public static int ToInt32(this string s) {
         return Convert.ToInt32(s);
@@ -270,9 +336,37 @@ public static class Extension {
         list.Select(k => Convert.ToString(k)).Aggregate((a, b) => a + "," + b)!;
 }
 
-public class Node {
-    public List<Node> Neighbors { get; set; } = new List<Node>();
+public enum EDirection {
+    Left,
+    Right,
+    Up,
+    Down,
+    LeftUp,
+    LeftDown,
+    RightUp,
+    RightDown
+}
 
+public class Connection {
+    public Node Node { get; set; }
+    public EDirection EDirection { get; set; }
+
+    public Connection(Node node, EDirection eDirection) {
+        Node = node;
+        EDirection = eDirection;
+    }
+}
+
+public class Node {
+    public Node Previous { get; set; }
+    public Node Parent { get; set; }
+    
+    public List<Node> GetNeighbors() {
+        return Neighbors.Select(k => k.Node).ToList();
+    }
+
+
+    public List<Connection> Neighbors { get; set; } = new();
     public bool Visited { get; set; } = false;
     public int VisitedCount { get; set; } = 0;
 
@@ -283,6 +377,14 @@ public class Node {
     public char Type;
 
     public Node() {
+    }
+    
+    public Connection GetDirection(EDirection dir) {
+        if (Neighbors.Any(k=>k.EDirection == dir))
+            return this.Neighbors.First(k => k.EDirection == dir);
+        else {
+            return null;
+        }
     }
 
     public Node(char c) {

@@ -7,7 +7,7 @@ r.ReadFolder("files/level4");
 //r.ReadWholeFile("files/level4/level4_example.in");
 
 foreach (var l in r.GetInputs()) {
-    l.SetOutput();
+    l.SetOutputToFile();
 
     var messageCount = l.ReadInt();
 

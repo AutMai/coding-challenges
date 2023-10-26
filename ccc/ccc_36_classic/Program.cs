@@ -1,13 +1,13 @@
 ﻿using System.Text;
 using CodingHelper;
-
+/*
 var r = new InputReader();
 
 r.ReadZipFile("files/level4.zip");
 //r.ReadWholeFile("files/level3/level3_7.in");
 
 foreach (var l in r.GetInputs()) {
-    //l.SetOutput();
+    //l.SetOutputToFile();
 
     var rowCount = l.ReadInt();
 
@@ -19,7 +19,9 @@ foreach (var l in r.GetInputs()) {
         map[i] = l.Read().Replace('G', 'W').ToCharArray().Select((k, x) => new Node(k) {PosY = i, PosX = x}).ToArray();
     }
 
+    /*
     map.ToNeighbors();
+    #1#
 
     var cointCount = map.SelectMany(k => k).Count(k => k.Type == 'C');
 
@@ -186,11 +188,11 @@ public class Player : AMovable {
         /*if (node.Type == 'W') {
             Console.WriteLine(CoinCount + " NO");
             Dead = true;
-        }*/
+        }#1#
         /*else if (node.Ghost) {
             Console.WriteLine(CoinCount + " NO");
             Dead = true;
-        }*/
+        }#1#
         if (node.Type == 'C') {
             CurrentNode.Type = 'E';
             CoinCount++;
@@ -229,4 +231,4 @@ public class Ghost : AMovable {
 
     public Ghost(Node currentNode) : base(currentNode) {
     }
-}
+}*/

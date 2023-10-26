@@ -8,7 +8,7 @@ r.ReadWholeFile("files/level5/level5_1.in", " ", true);
 //r.ReadZipFile("files/level5.zip", " ", true);
 
 foreach (var l in r.GetInputs()) {
-    //l.SetOutput();
+    //l.SetOutputToFile();
 
     var messageCount = l.ReadInt();
 
