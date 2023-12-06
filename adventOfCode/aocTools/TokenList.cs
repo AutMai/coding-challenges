@@ -22,6 +22,10 @@ public class TokenList : List<string> {
         return int.Parse(Read());
     }
     
+    public long ReadLong() {
+        return long.Parse(Read());
+    }
+    
     public void Remove(int count) {
         this.RemoveRange(0, count);
     }
