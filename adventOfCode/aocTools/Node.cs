@@ -30,6 +30,6 @@ public class Node<T> {
     public List<Node<T>> FullNeighbors { get; set; } = new();
 
     public override string ToString() {
-        return $"{PosX},{PosY}";
+        return $"{PosX},{PosY} - {Value}";
     }
 }

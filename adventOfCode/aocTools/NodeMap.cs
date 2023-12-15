@@ -239,6 +239,45 @@ public class NodeMap<T> {
 
         return null; // No path found
     }
+    
+    // implement shortest path with exclusion of nodes that have a certain value and diagonal neighbors are not allowed
+    
+    public List<Node<T>> ShortestPathNoDiagonals(Node<T> start, Node<T> end, List<T> exclude = null) {
+        var openSet = new HashSet<Node<T>> { start };
+        var cameFrom = new Dictionary<Node<T>, Node<T>>();
+        var gScore = new Dictionary<Node<T>, double> { { start, 0 } };
+        var fScore = new Dictionary<Node<T>, double> { { start, Heuristic(start, end) } };
+
+        while (openSet.Count > 0) {
+            var current = openSet.OrderBy(node => fScore[node]).First();
+
+            if (current == end) {
+                return ReconstructPath(cameFrom, end);
+            }
+
+            openSet.Remove(current);
+
+            foreach (var neighbor in current.Neighbors) {
+                if (neighbor is null || (exclude != null && exclude.Contains(neighbor.Value))) {
+                    continue;
+                }
+
+                var tentativeGScore = gScore[current] + 1; // Assuming a cost of 1 for moving between adjacent nodes
+
+                if (!gScore.ContainsKey(neighbor) || tentativeGScore < gScore[neighbor]) {
+                    cameFrom[neighbor] = current;
+                    gScore[neighbor] = tentativeGScore;
+                    fScore[neighbor] = gScore[neighbor] + Heuristic(neighbor, end);
+
+                    if (!openSet.Contains(neighbor)) {
+                        openSet.Add(neighbor);
+                    }
+                }
+            }
+        }
+
+        return null; // No path found
+    }
 
     private double Heuristic(Node<T> a, Node<T> b) {
         // You can implement a heuristic function (e.g., Euclidean distance) here.
