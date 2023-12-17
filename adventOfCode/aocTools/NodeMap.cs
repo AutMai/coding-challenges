@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Numerics;
+using System.Text;
 using aocTools.Neo4J;
 
 namespace aocTools;
@@ -303,4 +304,17 @@ public class NodeMap<T> {
 
     public Node<T> GetNode(int x, int y) => Map[x, y];
     public Node<T> GetNode(Vector2 pos) => Map[(int)pos.X, (int)pos.Y];
+
+    public override string ToString() {
+        var sb = new StringBuilder();
+        for (int y = 0; y < Height; y++) {
+            for (int x = 0; x < Width; x++) {
+                sb.Append(Map[x, y].Value);
+            }
+
+            sb.AppendLine();
+        }
+
+        return sb.ToString();
+    }
 }
