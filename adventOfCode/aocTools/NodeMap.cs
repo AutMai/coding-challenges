@@ -1,4 +1,7 @@
-﻿namespace aocTools;
+﻿using System.Linq.Expressions;
+using aocTools.Neo4J;
+
+namespace aocTools;
 
 // create generic class NodeMap that is derived from two-dimensional array of generic type T
 
@@ -203,7 +206,7 @@ public class NodeMap<T> {
 
     // implement shortest path with exclusion of nodes that have a certain value but diagonal neighbors are allowed
 
-    public List<Node<T>> ShortestPath(Node<T> start, Node<T> end, List<T> exclude = null) {
+    public Tuple<List<Node<T>>,double> ShortestPath(Node<T> start, Node<T> end, Func<Node<T>, IEnumerable<Node<T>>> neighbors, Func<Node<T>, int> cost, List<T> exclude = null) {
         var openSet = new HashSet<Node<T>> { start };
         var cameFrom = new Dictionary<Node<T>, Node<T>>();
         var gScore = new Dictionary<Node<T>, double> { { start, 0 } };
@@ -213,17 +216,17 @@ public class NodeMap<T> {
             var current = openSet.OrderBy(node => fScore[node]).First();
 
             if (current == end) {
-                return ReconstructPath(cameFrom, end);
+                return new Tuple<List<Node<T>>, double>(ReconstructPath(cameFrom, end), gScore[end]);
             }
 
             openSet.Remove(current);
 
-            foreach (var neighbor in current.FullNeighbors) {
+            foreach (var neighbor in neighbors(current)) {
                 if (neighbor is null || (exclude != null && exclude.Contains(neighbor.Value))) {
                     continue;
                 }
 
-                var tentativeGScore = gScore[current] + 1; // Assuming a cost of 1 for moving between adjacent nodes
+                var tentativeGScore = gScore[current] + cost(neighbor);
 
                 if (!gScore.ContainsKey(neighbor) || tentativeGScore < gScore[neighbor]) {
                     cameFrom[neighbor] = current;
@@ -240,50 +243,11 @@ public class NodeMap<T> {
         return null; // No path found
     }
     
-    // implement shortest path with exclusion of nodes that have a certain value and diagonal neighbors are not allowed
-    
-    public List<Node<T>> ShortestPathNoDiagonals(Node<T> start, Node<T> end, List<T> exclude = null) {
-        var openSet = new HashSet<Node<T>> { start };
-        var cameFrom = new Dictionary<Node<T>, Node<T>>();
-        var gScore = new Dictionary<Node<T>, double> { { start, 0 } };
-        var fScore = new Dictionary<Node<T>, double> { { start, Heuristic(start, end) } };
-
-        while (openSet.Count > 0) {
-            var current = openSet.OrderBy(node => fScore[node]).First();
-
-            if (current == end) {
-                return ReconstructPath(cameFrom, end);
-            }
-
-            openSet.Remove(current);
-
-            foreach (var neighbor in current.Neighbors) {
-                if (neighbor is null || (exclude != null && exclude.Contains(neighbor.Value))) {
-                    continue;
-                }
-
-                var tentativeGScore = gScore[current] + 1; // Assuming a cost of 1 for moving between adjacent nodes
-
-                if (!gScore.ContainsKey(neighbor) || tentativeGScore < gScore[neighbor]) {
-                    cameFrom[neighbor] = current;
-                    gScore[neighbor] = tentativeGScore;
-                    fScore[neighbor] = gScore[neighbor] + Heuristic(neighbor, end);
-
-                    if (!openSet.Contains(neighbor)) {
-                        openSet.Add(neighbor);
-                    }
-                }
-            }
-        }
-
-        return null; // No path found
-    }
-
     private double Heuristic(Node<T> a, Node<T> b) {
         // You can implement a heuristic function (e.g., Euclidean distance) here.
         // For example:
         // return Math.Sqrt(Math.Pow(a.PosX - b.PosX, 2) + Math.Pow(a.PosY - b.PosY, 2));
-        return 0; // Default heuristic (no cost estimation)
+        return 0;
     }
 
     private List<Node<T>> ReconstructPath(Dictionary<Node<T>, Node<T>> cameFrom, Node<T> current) {
@@ -317,4 +281,6 @@ public class NodeMap<T> {
             Console.WriteLine();
         }
     }
+
+    public Node<T> GetNode(int x, int y) => Map[x, y];
 }
