@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Numerics;
 using aocTools.Neo4J;
 
 namespace aocTools;
@@ -281,6 +282,25 @@ public class NodeMap<T> {
             Console.WriteLine();
         }
     }
+    
+    public void PrintPath(List<Node<T>> path) {
+        // print the whole map and mark the path from start to end
+
+        for (int y = 0; y < Height; y++) {
+            for (int x = 0; x < Width; x++) {
+                var n = Map[x, y];
+                if (path.Contains(n))
+                    Console.BackgroundColor = ConsoleColor.Blue;
+
+                Console.Write(n.Value);
+
+                Console.BackgroundColor = ConsoleColor.Black;
+            }
+
+            Console.WriteLine();
+        }
+    }
 
     public Node<T> GetNode(int x, int y) => Map[x, y];
+    public Node<T> GetNode(Vector2 pos) => Map[(int)pos.X, (int)pos.Y];
 }
