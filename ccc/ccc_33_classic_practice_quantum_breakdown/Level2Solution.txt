@@ -1,0 +1,40 @@
+using CodingHelper;
+
+var r = new InputReader(2, true, ",", false);
+
+
+foreach (var l in r.GetInputs()) {
+    List<FlightEntry> flightEntries = new();
+    var airportRoutes = new Dictionary<string, int>(); 
+    l.SetOutput();
+    var flightEntryAmount = l.ReadInt();
+    // for loop flightEntryAmount times
+    for (int i = 0; i < flightEntryAmount; i++) {
+        var timestamp = l.ReadInt();
+        var latitude = l.ReadDecimal();
+        var longitude = l.ReadDecimal();
+        var altitude = l.ReadDecimal();
+        var start = l.Read();
+        var destination = l.Read();
+        var takeoff = l.ReadInt();
+        var flightEntry = new FlightEntry(timestamp, latitude, longitude, altitude, start, destination, takeoff);
+        flightEntries.Add(flightEntry);
+        
+        var key = start + " " + destination;
+        if (airportRoutes.ContainsKey(key)) {
+            airportRoutes[key]++;
+        } else {
+            airportRoutes.Add(key, 1);
+        }
+    }
+    
+    
+    // print airportRoutes ordered by Start and then by Destination
+    var orderedAirportRoutes = airportRoutes.OrderBy(x => x.Key.Split(" ")[0]).ThenBy(x => x.Key.Split(" ")[1]);
+    foreach (var route in orderedAirportRoutes) {
+        Console.WriteLine(route.Key + " " + route.Value);
+    }
+    
+}
+
+record FlightEntry(int Timestamp, decimal Latitude, decimal Longitude, decimal Altitude, string Start, string Destination, int Takeoff);

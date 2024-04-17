@@ -1,47 +1,81 @@
-﻿using CodingHelper;
+﻿using System.Globalization;
+using CodingHelper;
+using CsvHelper;
+using CsvHelper.Configuration;
 
-var r = new InputReader(3, true, ",", false);
+var r = new InputReader(4, false, " ", false);
 
 
 foreach (var l in r.GetInputs()) {
     List<FlightEntry> flightEntries = new();
-    var airportRoutes = new Dictionary<string, int>();
     l.SetOutput();
     var flightEntryAmount = l.ReadInt();
     // for loop flightEntryAmount times
     for (int i = 0; i < flightEntryAmount; i++) {
-        var latitude = l.ReadDouble();
-        var longitude = l.ReadDouble();
-        var altitude = l.ReadDouble();
-
-        flightEntries.Add(new FlightEntry(latitude, longitude, altitude));
+        var flightId = l.ReadInt();
+        var timestamp = l.ReadInt();
+        flightEntries.Add(new FlightEntry(flightId, timestamp));
     }
 
     foreach (var fe in flightEntries) {
-        var ecef = Helpers.FlightEntryToECEF(fe);
-        Console.WriteLine($"{ecef.X} {ecef.Y} {ecef.Z}");
+        // open a csv file that has the name of the flightId
+        var fileName = InputReader.GetCompletePath($"files/usedFlights/{fe.FlightId}.csv");
+        // read the file and get coordinates at the timestamp
+        // csv is in the following format
+        // startAirport
+        // endAirport
+        // takeOffTimestamp
+        // N
+        // timestampOffset,lat,long,altitude (repeats N times)
+        bool found = false;
+        // if there is a timestamp that is equal to the timestamp of the flight entry print the coordinates
+        // if not get timestamp above and below and interpolate
+        // get the line of the file that has the timestamp or the two lines that are above and below
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture) {
+            HasHeaderRecord = false
+        };
+        using (var reader = new StreamReader(fileName)) {
+            using (var csv = new CsvReader(reader, config)) {
+                // get the records but the first 4 lines are different and are single values
+                csv.Read();
+                var startAirport = csv.GetField<string>(0);
+                csv.Read();
+                var endAirport = csv.GetField<string>(0);
+                csv.Read();
+                var takeOffTimestamp = csv.GetField<int>(0);
+                csv.Read();
+                var N = csv.GetField<int>(0);
+                // get the records
+                var records = csv.GetRecords<Coordinate>().ToList();
+                
+                // convert fe Timestamp to offset
+                var offset = fe.Timestamp - takeOffTimestamp;
+                
+                // get the record that has the timestamp
+                var record = records.FirstOrDefault(r => r.TimestampOffset == offset);
+                if (record != null) {
+                    Console.WriteLine($"{record.Latitude} {record.Longitude} {record.Altitude}");
+                    found = true;
+                } else {
+                    // get the records that are above and below
+                    var above = records.Where(r => r.TimestampOffset < offset).OrderBy(r => r.TimestampOffset).LastOrDefault();
+                    var below = records.Where(r => r.TimestampOffset > offset).OrderBy(r => r.TimestampOffset).FirstOrDefault();
+                    if (above != null && below != null) {
+                        // interpolate
+                        var lat = above.Latitude + (below.Latitude - above.Latitude) * (offset - above.TimestampOffset) / (below.TimestampOffset - above.TimestampOffset);
+                        var lon = above.Longitude + (below.Longitude - above.Longitude) * (offset - above.TimestampOffset) / (below.TimestampOffset - above.TimestampOffset);
+                        var alt = above.Altitude + (below.Altitude - above.Altitude) * (offset - above.TimestampOffset) / (below.TimestampOffset - above.TimestampOffset);
+                        
+                        Console.WriteLine($"{lat} {lon} {alt}");
+                        found = true;
+                    }
+                }
+            }
+        }
     }
 }
 
-public static class Helpers {
-    public static ECEF FlightEntryToECEF(FlightEntry flightEntry) {
-        var latitude = flightEntry.Latitude;
-        var longitude = flightEntry.Longitude;
-        var altitude = flightEntry.Altitude;
-        double radius = 6371000.0; // Earth's radius in meters
 
-        // convert latitude and longitude to radians
-        double lat_rad = latitude * Math.PI / 180.0;
-        double lon_rad = longitude * Math.PI / 180.0;
+public record FlightEntry(int FlightId, int Timestamp);
 
-        // calculate ECEF coordinates
-        double x = (radius + altitude) * Math.Cos(lat_rad) * Math.Cos(lon_rad);
-        double y = (radius + altitude) * Math.Cos(lat_rad) * Math.Sin(lon_rad);
-        double z = (radius + altitude) * Math.Sin(lat_rad);
-        return new ECEF(x, y, z);
-    }
-}
-
-public record FlightEntry(double Latitude, double Longitude, double Altitude);
-
-public record ECEF(double X, double Y, double Z);
+public record Coordinate(int TimestampOffset, double Latitude, double Longitude, double Altitude);

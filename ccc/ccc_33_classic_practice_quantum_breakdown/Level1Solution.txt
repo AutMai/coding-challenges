@@ -1,0 +1,52 @@
+// See https://aka.ms/new-console-template for more information
+
+using CodingHelper;
+
+var r = new InputReader(1, false, ",", false);
+
+
+foreach (var l in r.GetInputs()) {
+    List<FlightEntry> flightEntries = new();
+    //l.SetOutput();
+    var flightEntryAmount = l.ReadInt();
+    // for loop flightEntryAmount times
+    for (int i = 0; i < flightEntryAmount; i++) {
+        var timestamp = l.ReadInt();
+        var latitude = l.ReadDecimal();
+        var longitude = l.ReadDecimal();
+        var altitude = l.ReadDecimal();
+        var flightEntry = new FlightEntry(timestamp, latitude, longitude, altitude);
+        flightEntries.Add(flightEntry);
+    }
+
+    // print in following format:
+    // minTimestamp maxTimestamp
+    // minLat maxLat
+    // minLong maxLong
+    // maxAltitude
+
+    var minTimestamp = int.MaxValue;
+    var maxTimestamp = int.MinValue;
+    var minLat = decimal.MaxValue;
+    var maxLat = decimal.MinValue;
+    var minLong = decimal.MaxValue;
+    var maxLong = decimal.MinValue;
+    var maxAltitude = decimal.MinValue;
+
+    foreach (var entry in flightEntries) {
+        minTimestamp = Math.Min(minTimestamp, entry.Timestamp);
+        maxTimestamp = Math.Max(maxTimestamp, entry.Timestamp);
+        minLat = Math.Min(minLat, entry.Latitude);
+        maxLat = Math.Max(maxLat, entry.Latitude);
+        minLong = Math.Min(minLong, entry.Longitude);
+        maxLong = Math.Max(maxLong, entry.Longitude);
+        maxAltitude = Math.Max(maxAltitude, entry.Altitude);
+    }
+    
+    Console.WriteLine($"{minTimestamp} {maxTimestamp}");
+    Console.WriteLine($"{minLat} {maxLat}");
+    Console.WriteLine($"{minLong} {maxLong}");
+    Console.WriteLine($"{maxAltitude}");
+}
+
+record FlightEntry(int Timestamp, decimal Latitude, decimal Longitude, decimal Altitude);
