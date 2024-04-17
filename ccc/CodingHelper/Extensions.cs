@@ -47,12 +47,12 @@ public class InputReader {
     //liest folder mit allen dateien ein
     private void ReadFolder() {
         var folderName = filenameExlExt;
-        if (example) {
-            foreach (var file in Directory.EnumerateFiles(GetCompletePath(folderName), "*example.in")) {
-                ReadWholeFile(file);
-            }
+
+        foreach (var file in Directory.EnumerateFiles(GetCompletePath(folderName), "*example.in")) {
+            ReadWholeFile(file);
         }
-        else {
+
+        if (!example) {
             foreach (var file in Directory.EnumerateFiles(GetCompletePath(folderName), "*.in")) {
                 ReadWholeFile(file);
             }
@@ -223,7 +223,6 @@ public class Input {
     }
 
 
-    
     public decimal ReadDecimal() {
         return Convert.ToDecimal(Read().Replace(",", "."), new CultureInfo("en-US"));
     }
@@ -263,7 +262,6 @@ public class Input {
 
     //ob file fertig gelesen ist
     public bool HasEnded() => Index >= Inputs.Count;
-
 }
 
 public static class Extension {
@@ -338,8 +336,10 @@ public static class Extension {
                 if (top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x], EDirection.Up));
                 if (bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x], EDirection.Down));
                 if (left && top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x - 1], EDirection.LeftUp));
-                if (right && top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x + 1], EDirection.RightUp));
-                if (left && bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x - 1], EDirection.LeftDown));
+                if (right && top)
+                    array[y][x].Neighbors.Add(new Connection(array[y - 1][x + 1], EDirection.RightUp));
+                if (left && bottom)
+                    array[y][x].Neighbors.Add(new Connection(array[y + 1][x - 1], EDirection.LeftDown));
                 if (right && bottom)
                     array[y][x].Neighbors.Add(new Connection(array[y + 1][x + 1], EDirection.RightDown));
 
