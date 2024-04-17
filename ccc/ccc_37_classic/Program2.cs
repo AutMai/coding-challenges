@@ -1,9 +1,8 @@
 ﻿using System.Text;
 using CodingHelper;
 
-var r = new InputReader();
+var r = new InputReader(3);
 
-r.ReadZipFile("files/level3.zip", " ");
 
 
 

@@ -2,10 +2,7 @@
 using System.Text.RegularExpressions;
 using CodingHelper;
 
-var r = new InputReader();
-//r.ReadFolder("files/level4");
-r.ReadWholeFile("files/level5/level5_1.in", " ", true);
-//r.ReadZipFile("files/level5.zip", " ", true);
+var r = new InputReader(5,true, " ", true);
 
 foreach (var l in r.GetInputs()) {
     //l.SetOutputToFile();

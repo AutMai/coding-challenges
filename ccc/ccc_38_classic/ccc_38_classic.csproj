@@ -11,4 +11,8 @@
       <Folder Include="files\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\CodingHelper\CodingHelper.csproj" />
+    </ItemGroup>
+
 </Project>

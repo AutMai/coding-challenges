@@ -1,9 +1,7 @@
 ﻿using System;
 using CodingHelper;
 
-var r = new InputReader();
-
-r.ReadZipFile("files/level6.zip");
+var r = new InputReader(6);
 
 foreach (var level in r.GetInputs()) {
     level.SetOutputToFile();

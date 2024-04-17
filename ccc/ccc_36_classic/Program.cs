@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using CodingHelper;
-/*
-var r = new InputReader();
 
+var r = new InputReader(4);
+/*
 r.ReadZipFile("files/level4.zip");
 //r.ReadWholeFile("files/level3/level3_7.in");
 
@@ -13,10 +13,10 @@ foreach (var l in r.GetInputs()) {
 
     var moveableObjects = new List<AMovable>();
 
-    Node[][] map = new Node[rowCount][];
+    NodeKonst[][] map = new NodeKonst[rowCount][];
 
     for (int i = 0; i < rowCount; i++) {
-        map[i] = l.Read().Replace('G', 'W').ToCharArray().Select((k, x) => new Node(k) {PosY = i, PosX = x}).ToArray();
+        map[i] = l.Read().Replace('G', 'W').ToCharArray().Select((k, x) => new NodeKonst(k) {PosY = i, PosX = x}).ToArray();
     }
 
     /*
@@ -58,13 +58,13 @@ foreach (var l in r.GetInputs()) {
 }
 
 public class GameMap {
-    private Node[][] map;
+    private NodeKonst[][] map;
     public Player Player { get; set; }
     public List<Ghost> Ghosts = new List<Ghost>();
     public string rotations = "LDRU";
     public int rotIndex = 0;
 
-    public GameMap(Node[][] map) {
+    public GameMap(NodeKonst[][] map) {
         this.map = map;
     }
 
@@ -119,19 +119,19 @@ public class GameMap {
             RotatePlayer();
         }
         else if (map[movableObject.PosY][movableObject.PosX].Visited && Player.CurrentNode.Type != 'W') {
-            Node node;
+            NodeKonst nodeKonst;
             if (Player.CurrentNode.Neighbors.Where(n => n.Type != 'W').ToList().Exists(n => n.Visited == false)) {
-                node = Player.CurrentNode.Neighbors.Where(n => n.Type != 'W').First(n => n.Visited == false);
+                nodeKonst = Player.CurrentNode.Neighbors.Where(n => n.Type != 'W').First(n => n.Visited == false);
             }
             else {
-                node = Player.CurrentNode.Neighbors.Where(n => n.Type != 'W').MinBy(n => n.VisitedCount);
+                nodeKonst = Player.CurrentNode.Neighbors.Where(n => n.Type != 'W').MinBy(n => n.VisitedCount);
             }
 
-            Player.PosX = node.PosX;
-            Player.PosY = node.PosY;
+            Player.PosX = nodeKonst.PosX;
+            Player.PosY = nodeKonst.PosY;
             // check if neighbor is above, below, left or right
-            if (node.PosX == Player.CurrentNode.PosX) {
-                if (node.PosY > Player.CurrentNode.PosY) {
+            if (nodeKonst.PosX == Player.CurrentNode.PosX) {
+                if (nodeKonst.PosY > Player.CurrentNode.PosY) {
                     Player.Rotation = 'D';
                 }
                 else {
@@ -139,7 +139,7 @@ public class GameMap {
                 }
             }
             else {
-                if (node.PosX > Player.CurrentNode.PosX) {
+                if (nodeKonst.PosX > Player.CurrentNode.PosX) {
                     Player.Rotation = 'R';
                 }
                 else {
@@ -147,7 +147,7 @@ public class GameMap {
                 }
             }
 
-            movableObject.SetNode(node, Player.CurrentNode);
+            movableObject.SetNode(nodeKonst, Player.CurrentNode);
         }
         else {
             movableObject.SetNode(map[movableObject.PosY][movableObject.PosX], map[prevPosY][prevPosX]);
@@ -160,12 +160,12 @@ public class GameMap {
     public override string ToString() {
         var sb = new StringBuilder();
         foreach (var row in map) {
-            foreach (var node in row) {
-                if (node == Player.CurrentNode) {
+            foreach (var nodeKonst in row) {
+                if (nodeKonst == Player.CurrentNode) {
                     sb.Append('X');
                 }
                 else {
-                    sb.Append(node.Type);
+                    sb.Append(nodeKonst.Type);
                 }
             }
 
@@ -181,26 +181,26 @@ public class Player : AMovable {
     public bool Dead = false;
     public char Rotation = 'L';
 
-    public override void SetNode(Node node, Node prevNode) {
-        node.Visited = true;
-        node.VisitedCount++;
-        CurrentNode = node;
-        /*if (node.Type == 'W') {
+    public override void SetNode(NodeKonst nodeKonst, NodeKonst prevNode) {
+        nodeKonst.Visited = true;
+        nodeKonst.VisitedCount++;
+        CurrentNode = nodeKonst;
+        /*if (nodeKonst.Type == 'W') {
             Console.WriteLine(CoinCount + " NO");
             Dead = true;
         }#1#
-        /*else if (node.Ghost) {
+        /*else if (nodeKonst.Ghost) {
             Console.WriteLine(CoinCount + " NO");
             Dead = true;
         }#1#
-        if (node.Type == 'C') {
+        if (nodeKonst.Type == 'C') {
             CurrentNode.Type = 'E';
             CoinCount++;
         }
     }
 
 
-    public Player(Node currentNode) :
+    public Player(NodeKonst currentNode) :
         base(currentNode) {
     }
 }
@@ -208,27 +208,27 @@ public class Player : AMovable {
 public abstract class AMovable : ISetPosition {
     public StringBuilder Moves = new StringBuilder();
 
-    protected AMovable(Node currentNode) {
+    protected AMovable(NodeKonst currentNode) {
         CurrentNode = currentNode;
     }
 
     public int PosX { get; set; }
     public int PosY { get; set; }
-    public Node CurrentNode { get; set; }
-    public abstract void SetNode(Node node, Node prevNode);
+    public NodeKonst CurrentNode { get; set; }
+    public abstract void SetNode(NodeKonst nodeKonst, NodeKonst prevNode);
 }
 
 public interface ISetPosition {
-    public void SetNode(Node node, Node prevNode);
+    public void SetNode(NodeKonst nodeKonst, NodeKonst prevNode);
 }
 
 public class Ghost : AMovable {
-    public override void SetNode(Node node, Node prevNode) {
+    public override void SetNode(NodeKonst nodeKonst, NodeKonst prevNode) {
         prevNode.Ghost = false;
-        CurrentNode = node;
-        node.Ghost = true;
+        CurrentNode = nodeKonst;
+        nodeKonst.Ghost = true;
     }
 
-    public Ghost(Node currentNode) : base(currentNode) {
+    public Ghost(NodeKonst currentNode) : base(currentNode) {
     }
 }*/

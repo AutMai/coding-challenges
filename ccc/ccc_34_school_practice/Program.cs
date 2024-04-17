@@ -1,8 +1,7 @@
 ﻿using CodingHelper;
 
-var r = new InputReader();
+var r = new InputReader(4);
 
-r.ReadZipFile("files/level4.zip", " ");
 
 foreach (var l in r.GetInputs()) {
     l.SetOutput();

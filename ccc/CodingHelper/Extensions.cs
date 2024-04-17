@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.Globalization;
+using System.IO.Compression;
 using System.Text;
 
 namespace CodingHelper;
@@ -7,20 +8,54 @@ public class InputReader {
     private List<Input> _inputs { get; set; } = new();
     private int _currentInputIndex = 0;
 
-    //list zip file und erstellt orderner mit allen dateien
-    public void ReadZipFile(string zipFile, string splitValue = " ", bool lines = false) {
-        UnzipFile(zipFile);
-        ReadFolder(zipFile.Replace(".zip", ""), splitValue, lines);
+    private bool example = false;
+    private string splitValue = " ";
+    private bool lines = false;
+    private string filename;
+    private string filenameExlExt;
+
+    public InputReader(string filename, bool example = false, string splitValue = " ", bool lines = false) {
+        this.filename = filename;
+        this.filenameExlExt = filename.Replace(".zip", "");
+        this.example = example;
+        this.splitValue = splitValue;
+        this.lines = lines;
+        ReadZipFile();
     }
 
-    public void UnzipFile(string zipFile) {
+
+    public InputReader(int level, bool example = false, string splitValue = " ", bool lines = false)
+        : this($"files/level{level}.zip", example, splitValue, lines) {
+    }
+    //
+    // public InputReader(string filename, bool example = false, string splitValue = " ", bool lines = false) : this(
+    //     example, splitValue, lines) {
+    //     ReadZipFile(filename);
+    // }
+
+    //list zip file und erstellt orderner mit allen dateien
+    public void ReadZipFile() {
+        UnzipFile();
+        ReadFolder();
+    }
+
+    public void UnzipFile() {
+        var zipFile = filename;
         ZipFile.ExtractToDirectory(GetCompletePath(zipFile), GetCompletePath(zipFile.Replace(".zip", "")), true);
     }
 
     //liest folder mit allen dateien ein
-    private void ReadFolder(string folderName, string splitValue, bool lines) {
-        foreach (string file in Directory.EnumerateFiles(GetCompletePath(folderName), "*.in")) {
-            ReadWholeFile(file, splitValue, lines);
+    private void ReadFolder() {
+        var folderName = filenameExlExt;
+        if (example) {
+            foreach (var file in Directory.EnumerateFiles(GetCompletePath(folderName), "*example.in")) {
+                ReadWholeFile(file);
+            }
+        }
+        else {
+            foreach (var file in Directory.EnumerateFiles(GetCompletePath(folderName), "*.in")) {
+                ReadWholeFile(file);
+            }
         }
     }
 
@@ -30,7 +65,7 @@ public class InputReader {
     }
 
     //list einen file ein und splittet nach splitValue
-    public void ReadWholeFile(string fileName, string splitValue = " ", bool lines = false) {
+    public void ReadWholeFile(string fileName) {
         List<string> input = new();
         if (lines) {
             input = File.ReadAllLines(GetCompletePath(fileName)).ToList();
@@ -187,6 +222,12 @@ public class Input {
         return int.Parse(Read());
     }
 
+
+    
+    public decimal ReadDecimal() {
+        return Convert.ToDecimal(Read().Replace(",", "."), new CultureInfo("en-US"));
+    }
+
     public char ReadChar() {
         return Convert.ToChar(Read());
     }
@@ -197,7 +238,7 @@ public class Input {
     }
 
     public double ReadDouble() {
-        return double.Parse(Read());
+        return Convert.ToDouble(Read().Replace(",", "."), new CultureInfo("en-US"));
     }
 
     public bool ReadBool() {
@@ -222,35 +263,31 @@ public class Input {
 
     //ob file fertig gelesen ist
     public bool HasEnded() => Index >= Inputs.Count;
+
 }
 
 public static class Extension {
-    
-    public static IEnumerable<IList<TSource>> Split<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
-    {
+    public static IEnumerable<IList<TSource>> Split<TSource>(this IEnumerable<TSource> source,
+        Func<TSource, bool> predicate) {
         var list = new List<TSource>();
 
-        foreach (var element in source)
-        {
-            if (predicate(element))
-            {
-                if (list.Count > 0)
-                {
+        foreach (var element in source) {
+            if (predicate(element)) {
+                if (list.Count > 0) {
                     yield return list;
                     list = new List<TSource>();
                 }
             }
-            else
-            {
+            else {
                 list.Add(element);
             }
         }
 
-        if (list.Count > 0)
-        {
+        if (list.Count > 0) {
             yield return list;
         }
     }
+
     public static T Pop<T>(this List<T> list) {
         var item = list[0];
         list.RemoveAt(0);
@@ -264,8 +301,8 @@ public static class Extension {
     }
 
 
-    /*public static List<Node> ToNeighbors(this Node[][] array) {
-        var nodes = new List<Node>();
+    /*public static List<NodeKonst> ToNeighbors(this NodeKonst[][] array) {
+        var nodes = new List<NodeKonst>();
 
         for (int y = 0; y < array.Length; y++) {
             for (int x = 0; x < array[y].Length; x++) {
@@ -286,8 +323,8 @@ public static class Extension {
         return nodes;
     }*/
 
-    public static List<Node> ToNeighborsFull(this Node[][] array) {
-        var nodes = new List<Node>();
+    public static List<NodeKonst> ToNeighborsFull(this NodeKonst[][] array) {
+        var nodes = new List<NodeKonst>();
 
         for (int y = 0; y < array.Length; y++) {
             for (int x = 0; x < array[y].Length; x++) {
@@ -303,7 +340,8 @@ public static class Extension {
                 if (left && top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x - 1], EDirection.LeftUp));
                 if (right && top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x + 1], EDirection.RightUp));
                 if (left && bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x - 1], EDirection.LeftDown));
-                if (right && bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x + 1], EDirection.RightDown));
+                if (right && bottom)
+                    array[y][x].Neighbors.Add(new Connection(array[y + 1][x + 1], EDirection.RightDown));
 
                 nodes.Add(array[y][x]);
             }
@@ -348,21 +386,21 @@ public enum EDirection {
 }
 
 public class Connection {
-    public Node Node { get; set; }
+    public NodeKonst NodeKonst { get; set; }
     public EDirection EDirection { get; set; }
 
-    public Connection(Node node, EDirection eDirection) {
-        Node = node;
+    public Connection(NodeKonst nodeKonst, EDirection eDirection) {
+        NodeKonst = nodeKonst;
         EDirection = eDirection;
     }
 }
 
-public class Node {
-    public Node Previous { get; set; }
-    public Node Parent { get; set; }
-    
-    public List<Node> GetNeighbors() {
-        return Neighbors.Select(k => k.Node).ToList();
+public class NodeKonst {
+    public NodeKonst Previous { get; set; }
+    public NodeKonst Parent { get; set; }
+
+    public List<NodeKonst> GetNeighbors() {
+        return Neighbors.Select(k => k.NodeKonst).ToList();
     }
 
 
@@ -376,18 +414,18 @@ public class Node {
 
     public char Type;
 
-    public Node() {
+    public NodeKonst() {
     }
-    
+
     public Connection GetDirection(EDirection dir) {
-        if (Neighbors.Any(k=>k.EDirection == dir))
+        if (Neighbors.Any(k => k.EDirection == dir))
             return this.Neighbors.First(k => k.EDirection == dir);
         else {
             return null;
         }
     }
 
-    public Node(char c) {
+    public NodeKonst(char c) {
         Type = c;
     }
 }

@@ -19,7 +19,6 @@ string GetOutputPath(string fileName) {
     return "../../../" + path[^2] + "/" + path[^1] + ".out";
 }
 
-var r = new InputReader();
 List<List<string>> fileContents = new();
 
 List<string> filenames = new();
@@ -42,9 +41,9 @@ foreach (var content in fileContents) {
     foreach (var honeyComb in honeyCombContents) {
         var borderCount = Convert.ToInt32(honeyComb[0]);
         var honeyCombLines = honeyComb.Skip(1).ToList();
-        List<List<Node>> nodes = new();
+        List<List<NodeKonst>> nodes = new();
         for (var i = 0; i < honeyCombLines.Count; i++) {
-            nodes.Add(honeyCombLines[i].ToArray().Select((k, index) => new Node() { Type = k, PosX = index, PosY = i })
+            nodes.Add(honeyCombLines[i].ToArray().Select((k, index) => new NodeKonst() { Type = k, PosX = index, PosY = i })
                 .ToList());
         }
 
@@ -59,31 +58,31 @@ foreach (var content in fileContents) {
                 var con = node.GetDirection(dir);
                 if (con is null)
                     return;
-                if (con.Node.GetDirection(dir) is null)
+                if (con.NodeKonst.GetDirection(dir) is null)
                     return;
 
-                con.Node = con.Node.GetDirection(dir).Node;
+                con.NodeKonst = con.NodeKonst.GetDirection(dir).NodeKonst;
             }
 
-            node.Neighbors.RemoveAll(k => k.Node.Type == '-');
+            node.Neighbors.RemoveAll(k => k.NodeKonst.Type == '-');
         });
 
         // remove all nodes from allnodes that are '-'
         allNodes.RemoveAll(k => k.Type == '-');
 
-        // we have a connected network of nodes, one node is of type W (wasp)
+        // we have a connected network of nodes, one nodeKonst is of type W (wasp)
         // check with a search algorithm if the wasp reach the outer border of the map
         // if yes, print out the path
         // if no, print out "Impossible"
 
-        // get the wasp node
+        // get the wasp nodeKonst
         var waspNode = allNodes.Single(k => k.Type == 'W');
 
         // get all nodes that are on the outer border (less than 6 neighbors)
         var outerNodes = allNodes.Where(k => k.Neighbors.Count < 6).ToList();
-        var path = new List<Node>();
+        var path = new List<NodeKonst>();
 
-        var borderPermutations = new List<Node[]>();
+        var borderPermutations = new List<NodeKonst[]>();
 
 
         while (path is not null) {
@@ -110,25 +109,25 @@ foreach (var content in fileContents) {
     Console.WriteLine();
 }
 
-static List<Node> BFS(Node start, List<Node> targets) {
-    Queue<Node> queue = new Queue<Node>();
-    HashSet<Node> visited = new HashSet<Node>();
+static List<NodeKonst> BFS(NodeKonst start, List<NodeKonst> targets) {
+    Queue<NodeKonst> queue = new Queue<NodeKonst>();
+    HashSet<NodeKonst> visited = new HashSet<NodeKonst>();
 
     queue.Enqueue(start);
     visited.Add(start);
 
     while (queue.Count > 0) {
-        Node current = queue.Dequeue();
+        NodeKonst current = queue.Dequeue();
 
         if (targets.Contains(current)) {
             return BuildPath(current);
         }
 
         foreach (Connection neighbor in current.Neighbors) {
-            if (!visited.Contains(neighbor.Node) && neighbor.Node.Type != 'X') {
-                queue.Enqueue(neighbor.Node);
-                visited.Add(neighbor.Node);
-                neighbor.Node.Parent = current;
+            if (!visited.Contains(neighbor.NodeKonst) && neighbor.NodeKonst.Type != 'X') {
+                queue.Enqueue(neighbor.NodeKonst);
+                visited.Add(neighbor.NodeKonst);
+                neighbor.NodeKonst.Parent = current;
             }
         }
     }
@@ -136,9 +135,9 @@ static List<Node> BFS(Node start, List<Node> targets) {
     return null;
 }
 
-static List<Node> BuildPath(Node target) {
-    List<Node> path = new List<Node>();
-    Node current = target;
+static List<NodeKonst> BuildPath(NodeKonst target) {
+    List<NodeKonst> path = new List<NodeKonst>();
+    NodeKonst current = target;
 
     while (current != null) {
         path.Add(current);
