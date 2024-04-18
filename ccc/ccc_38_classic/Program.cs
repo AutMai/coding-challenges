@@ -2,10 +2,7 @@
 
 using CodingHelper;
 
-var r = new InputReader();
-
-//r.ReadZipFile("files/level5.zip", " ", true);
-r.ReadWholeFile("files/level5/level5_example.in", " ");
+var r = new InputReader(5, false, " ", true);
 
 foreach (var l in r.GetInputs()) {
     //l.SetOutput();
@@ -24,16 +21,16 @@ foreach (var l in r.GetInputs()) {
     for (int i = 0; i < coordCount; i++) {
         var node = map[l.Read()];
 
-        var route = map.FindShortestPathAroundIsland(node, new List<char>() { 'W' });
-
-        if (route is null) {
-            Console.WriteLine("No route found");
-        }
-        else {
-            // print out the route
-            Console.WriteLine(string.Join(" ", route));
-            map.PrintPath(node, node,route);
-        }
+        // var route = map.FindShortestPathAroundIsland(node, new List<char>() { 'W' });
+        //
+        // if (route is null) {
+        //     Console.WriteLine("No route found");
+        // }
+        // else {
+        //     // print out the route
+        //     Console.WriteLine(string.Join(" ", route));
+        //     map.PrintPath(node, node,route);
+        // }
     }
 }
 

@@ -28,9 +28,8 @@ public class Node<T> {
     public Node<T>? BottomRight { get; set; }
     public List<Node<T>> Neighbors { get; set; } = new();
     public List<Node<T>> FullNeighbors { get; set; } = new();
-    public bool IsPerimeter { get; set; }
 
     public override string ToString() {
-        return $"{PosX},{PosY}";
+        return $"{PosX},{PosY} - {Value}";
     }
 }

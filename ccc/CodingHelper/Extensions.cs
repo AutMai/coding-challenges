@@ -265,6 +265,43 @@ public class Input {
 }
 
 public static class Extension {
+    
+    public static long ToDecimal(this string @this) => Convert.ToInt64(Convert.ToString(Convert.ToInt64(@this, 2), 10));
+
+    public static string CutFromBeginning(this string @this, int length) => @this.Substring(length);
+    public static string GetFromBeginning(this string @this, int length) => @this.Substring(0, length);
+    public static int ToInt(this char @this) => Convert.ToInt32(@this.ToString());
+    public static int ToInt(this string @this) => Convert.ToInt32(@this);
+
+    public static List<string> RemoveEmptyElements(this List<string> @this) =>
+        @this.Where(x => !string.IsNullOrEmpty(x)).ToList();
+
+    public static int Kgv(int a, int b) {
+        return (a / Ggt(a, b)) * b;
+    }
+
+    public static int Ggt(int a, int b) {
+        while (b != 0) {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+
+        return a;
+    }
+
+    static int gcd(int n1, int n2) {
+        if (n2 == 0) {
+            return n1;
+        }
+        else {
+            return gcd(n2, n1 % n2);
+        }
+    }
+
+    public static int lcm(int[] numbers) {
+        return numbers.Aggregate((S, val) => S * val / gcd(S, val));
+    }
     public static IEnumerable<IList<TSource>> Split<TSource>(this IEnumerable<TSource> source,
         Func<TSource, bool> predicate) {
         var list = new List<TSource>();
@@ -331,17 +368,17 @@ public static class Extension {
                 var top = (y - 1 >= 0);
                 var bottom = (y + 1 < array.Length);
 
-                if (left) array[y][x].Neighbors.Add(new Connection(array[y][x - 1], EDirection.Left));
-                if (right) array[y][x].Neighbors.Add(new Connection(array[y][x + 1], EDirection.Right));
-                if (top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x], EDirection.Up));
-                if (bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x], EDirection.Down));
-                if (left && top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x - 1], EDirection.LeftUp));
+                if (left) array[y][x].Neighbors.Add(new Connection(array[y][x - 1], EDirectionKonst.Left));
+                if (right) array[y][x].Neighbors.Add(new Connection(array[y][x + 1], EDirectionKonst.Right));
+                if (top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x], EDirectionKonst.Up));
+                if (bottom) array[y][x].Neighbors.Add(new Connection(array[y + 1][x], EDirectionKonst.Down));
+                if (left && top) array[y][x].Neighbors.Add(new Connection(array[y - 1][x - 1], EDirectionKonst.LeftUp));
                 if (right && top)
-                    array[y][x].Neighbors.Add(new Connection(array[y - 1][x + 1], EDirection.RightUp));
+                    array[y][x].Neighbors.Add(new Connection(array[y - 1][x + 1], EDirectionKonst.RightUp));
                 if (left && bottom)
-                    array[y][x].Neighbors.Add(new Connection(array[y + 1][x - 1], EDirection.LeftDown));
+                    array[y][x].Neighbors.Add(new Connection(array[y + 1][x - 1], EDirectionKonst.LeftDown));
                 if (right && bottom)
-                    array[y][x].Neighbors.Add(new Connection(array[y + 1][x + 1], EDirection.RightDown));
+                    array[y][x].Neighbors.Add(new Connection(array[y + 1][x + 1], EDirectionKonst.RightDown));
 
                 nodes.Add(array[y][x]);
             }
@@ -374,7 +411,7 @@ public static class Extension {
         list.Select(k => Convert.ToString(k)).Aggregate((a, b) => a + "," + b)!;
 }
 
-public enum EDirection {
+public enum EDirectionKonst {
     Left,
     Right,
     Up,
@@ -387,11 +424,11 @@ public enum EDirection {
 
 public class Connection {
     public NodeKonst NodeKonst { get; set; }
-    public EDirection EDirection { get; set; }
+    public EDirectionKonst EDirectionKonst { get; set; }
 
-    public Connection(NodeKonst nodeKonst, EDirection eDirection) {
+    public Connection(NodeKonst nodeKonst, EDirectionKonst eDirectionKonst) {
         NodeKonst = nodeKonst;
-        EDirection = eDirection;
+        EDirectionKonst = eDirectionKonst;
     }
 }
 
@@ -417,9 +454,9 @@ public class NodeKonst {
     public NodeKonst() {
     }
 
-    public Connection GetDirection(EDirection dir) {
-        if (Neighbors.Any(k => k.EDirection == dir))
-            return this.Neighbors.First(k => k.EDirection == dir);
+    public Connection GetDirection(EDirectionKonst dir) {
+        if (Neighbors.Any(k => k.EDirectionKonst == dir))
+            return this.Neighbors.First(k => k.EDirectionKonst == dir);
         else {
             return null;
         }

@@ -51,10 +51,10 @@ foreach (var content in fileContents) {
         var allNodes = mapNodes.ToNeighborsFull();
 
         allNodes.Where(k => k.Type == 'W' || k.Type == 'O').ToList().ForEach(node => {
-            SwitchConnection(EDirection.Left);
-            SwitchConnection(EDirection.Right);
+            SwitchConnection(EDirectionKonst.Left);
+            SwitchConnection(EDirectionKonst.Right);
 
-            void SwitchConnection(EDirection dir) {
+            void SwitchConnection(EDirectionKonst dir) {
                 var con = node.GetDirection(dir);
                 if (con is null)
                     return;
