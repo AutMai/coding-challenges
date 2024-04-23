@@ -9,6 +9,91 @@ public class NodeMap<T> {
     public Node<T>[,] Map { get; set; }
     public List<Node<T>> NodeList { get; set; } = new List<Node<T>>();
 
+    public NodeMap(List<Node<T>> nodeList) {
+        NodeList = nodeList;
+        // there can be negative coordinates but i want to move them as much to get them all positive
+        var minX = nodeList.Min(n => n.PosX);
+        var minY = nodeList.Min(n => n.PosY);
+        foreach (var n in nodeList) {
+            n.PosX -= minX;
+            n.PosY -= minY;
+        }
+
+        Map = new Node<T>[nodeList.Max(n => n.PosX) + 1, nodeList.Max(n => n.PosY) + 1];
+        foreach (var n in nodeList) {
+            Map[n.PosX, n.PosY] = n;
+        }
+
+        MapNeighbors();
+    }
+
+    public bool HasTwoNodesOnSameField() {
+        return NodeList.GroupBy(n => new { n.PosX, n.PosY }).Any(g => g.Count() > 1);
+    }
+
+    public bool IsValid(NodeMap<char> lawn) {
+        var treeNode = lawn.GetNode('X');
+
+        // first check if there are not two nodes on same pos
+        if (HasTwoNodesOnSameField()) {
+            return false;
+        }
+
+        // check if there is not a node where the tree is
+        var node = GetNode(treeNode.PosX, treeNode.PosY);
+        if (node is not null) {
+            return false;
+        }
+
+        // check if width and height is not bigger than lawn
+        if (lawn.Width < treeNode.PosX || lawn.Height < treeNode.PosY) {
+            return false;
+        }
+
+        // check if it contains nodes on all lawn nodes that are not the tree
+        var nodesToVisit = lawn.GetNodes('.');
+        foreach (var nv in nodesToVisit) {
+            var n = GetNode(nv.PosX, nv.PosY);
+            if (n is null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public string ConvertPathToInstructions(List<Node<T>> path) {
+        var sb = new StringBuilder();
+        var currentNode = path.Pop();
+
+        while (path.Count > 0) {
+            // if nextNode is currentNode.Top then add "U" to sb
+            // if nextNode is currentNode.Bottom then add "D" to sb
+            // if nextNode is currentNode.Left then add "L" to sb
+            // if nextNode is currentNode.Right then add "R" to sb
+
+            var nextNode = path.Pop();
+
+            if (nextNode == currentNode.Top) {
+                sb.Append("W");
+            }
+            else if (nextNode == currentNode.Bottom) {
+                sb.Append("S");
+            }
+            else if (nextNode == currentNode.Left) {
+                sb.Append("A");
+            }
+            else if (nextNode == currentNode.Right) {
+                sb.Append("D");
+            }
+
+            currentNode = nextNode;
+        }
+
+        return sb.ToString();
+    }
+
+
     public NodeMap(int width, int height) {
         Map = new Node<T>[width, height];
     }
@@ -86,7 +171,8 @@ public class NodeMap<T> {
 
     // implement dfs and bfs with exclusion of nodes that have a certain value
 
-    public List<Node<T>> DFS(Node<T> start, Node<T> end, List<T> exclude = null) {
+    public List<Node<T>> Dfs(Node<T> start, Node<T> end, Func<Node<T>, IEnumerable<Node<T>>> neighbors,
+        List<T> exclude = null) {
         var visited = new List<Node<T>>();
         var stack = new Stack<Node<T>>();
         stack.Push(start);
@@ -97,7 +183,7 @@ public class NodeMap<T> {
             visited.Add(current);
             if (current == end)
                 return visited;
-            foreach (var neighbor in current.Neighbors) {
+            foreach (var neighbor in neighbors(current)) {
                 if (neighbor is null)
                     continue;
                 if (exclude is not null && exclude.Contains(neighbor.Value))
@@ -109,7 +195,8 @@ public class NodeMap<T> {
         return null;
     }
 
-    public List<Node<T>> BFS(Node<T> start, Node<T> end, List<T> exclude = null) {
+    public List<Node<T>> Bfs(Node<T> start, Node<T> end, Func<Node<T>, IEnumerable<Node<T>>> neighbors,
+        List<T> exclude = null) {
         var visited = new List<Node<T>>();
         var queue = new Queue<Node<T>>();
         queue.Enqueue(start);
@@ -120,7 +207,7 @@ public class NodeMap<T> {
             visited.Add(current);
             if (current == end)
                 return visited;
-            foreach (var neighbor in current.Neighbors) {
+            foreach (var neighbor in neighbors(current)) {
                 if (neighbor is null)
                     continue;
                 if (exclude is not null && exclude.Contains(neighbor.Value))
@@ -156,57 +243,10 @@ public class NodeMap<T> {
         return visited;
     }
 
-    // implement same dfs and bfs but with full neighbors instead of just neighbors (diagonals included) 
-
-    public List<Node<T>> DFSFull(Node<T> start, Node<T> end, List<T> exclude = null) {
-        var visited = new List<Node<T>>();
-        var stack = new Stack<Node<T>>();
-        stack.Push(start);
-        while (stack.Count > 0) {
-            var current = stack.Pop();
-            if (visited.Contains(current))
-                continue;
-            visited.Add(current);
-            if (current == end)
-                return visited;
-            foreach (var neighbor in current.FullNeighbors) {
-                if (neighbor is null)
-                    continue;
-                if (exclude is not null && exclude.Contains(neighbor.Value))
-                    continue;
-                stack.Push(neighbor);
-            }
-        }
-
-        return null;
-    }
-
-    public List<Node<T>> BFSFull(Node<T> start, Node<T> end, List<T> exclude = null) {
-        var visited = new List<Node<T>>();
-        var queue = new Queue<Node<T>>();
-        queue.Enqueue(start);
-        while (queue.Count > 0) {
-            var current = queue.Dequeue();
-            if (visited.Contains(current))
-                continue;
-            visited.Add(current);
-            if (current == end)
-                return visited;
-            foreach (var neighbor in current.FullNeighbors) {
-                if (neighbor is null)
-                    continue;
-                if (exclude is not null && exclude.Contains(neighbor.Value))
-                    continue;
-                queue.Enqueue(neighbor);
-            }
-        }
-
-        return null;
-    }
-
     // implement shortest path with exclusion of nodes that have a certain value but diagonal neighbors are allowed
 
-    public Tuple<List<Node<T>>,double> ShortestPath(Node<T> start, Node<T> end, Func<Node<T>, IEnumerable<Node<T>>> neighbors, Func<Node<T>, int> cost, List<T> exclude = null) {
+    public Tuple<List<Node<T>>, double> ShortestPath(Node<T> start, Node<T> end,
+        Func<Node<T>, IEnumerable<Node<T>>> neighbors, Func<Node<T>, int> cost, List<T> exclude = null) {
         var openSet = new HashSet<Node<T>> { start };
         var cameFrom = new Dictionary<Node<T>, Node<T>>();
         var gScore = new Dictionary<Node<T>, double> { { start, 0 } };
@@ -242,7 +282,7 @@ public class NodeMap<T> {
 
         return null; // No path found
     }
-    
+
     private double Heuristic(Node<T> a, Node<T> b) {
         // You can implement a heuristic function (e.g., Euclidean distance) here.
         // For example:
@@ -260,30 +300,80 @@ public class NodeMap<T> {
         return path;
     }
 
-    public void PrintPath(Node<T> start, Node<T> end, List<Node<T>> path) {
-        // print the whole map and mark the path from start to end
+    // implement a algorithm that finds a path that visits every node exactly once on a graph and also chooses the start node and end node itself
 
-        for (int y = 0; y < Height; y++) {
-            for (int x = 0; x < Width; x++) {
-                var n = Map[x, y];
-                if (n == start)
-                    Console.BackgroundColor = ConsoleColor.Green;
-                else if (n == end)
-                    Console.BackgroundColor = ConsoleColor.Red;
-                else if (path.Contains(n))
-                    Console.BackgroundColor = ConsoleColor.Blue;
+    public List<Node<T>> FindPath() {
+        var pathShouldContain = NodeList.Where(n => n.Value is not 'X').ToList();
+        var edgeNodes = NodeList.Where(n => n.Neighbors.Count != 4).ToList();
 
-                Console.Write(n.Value);
-
-                Console.BackgroundColor = ConsoleColor.Black;
+        foreach (var n in edgeNodes) {
+            // check if the node is not a tree node continue
+            if (n.Value.Equals('X')) {
+                continue;
             }
 
-            Console.WriteLine();
+            for (int i = 0; i < 8; i++) {
+                var path = FindPath(n, i);
+                if (path.Count == pathShouldContain.Count)
+                    return path;
+            }
         }
+
+        return null;
     }
-    
-    public void PrintPath(List<Node<T>> path) {
+
+    private List<Node<T>> FindPath(Node<T> startNode, int order) {
+        // the idea is to start at a node and then choose a neighbor that has not been visited yet (priority: top, right, bottom, left)
+        // but check if the step would cause the map to be split into two parts (if so, then choose another neighbor)
+        // if there are no neighbors left then go back to the previous node and choose another neighbor
+
+        var visited = new List<Node<T>>();
+        var stack = new Stack<Node<T>>();
+        var current = startNode;
+        stack.Push(current);
+        visited.Add(current);
+        while (stack.Count > 0) {
+            var neighbors = current.GetNeighborOrder(order);
+            var next = neighbors.FirstOrDefault(n => !visited.Contains(n));
+            if (next is null) {
+                return visited;
+                current = stack.Pop();
+            }
+            else {
+                stack.Push(next);
+                visited.Add(next);
+                current = next;
+            }
+        }
+
+        return visited;
+    }
+
+    public void PrintPath(List<Node<T>> path, bool directional = false) {
         // print the whole map and mark the path from start to end
+
+        if (directional) {
+            for (int i = 0; i < path.Count - 1; i++) {
+                var current = path[i];
+                var next = path[i + 1];
+                if (current.PosX == next.PosX) {
+                    if (current.PosY > next.PosY) {
+                        current.Value = (T)Convert.ChangeType('U', typeof(T));
+                    }
+                    else {
+                        current.Value = (T)Convert.ChangeType('D', typeof(T));
+                    }
+                }
+                else {
+                    if (current.PosX > next.PosX) {
+                        current.Value = (T)Convert.ChangeType('L', typeof(T));
+                    }
+                    else {
+                        current.Value = (T)Convert.ChangeType('R', typeof(T));
+                    }
+                }
+            }
+        }
 
         for (int y = 0; y < Height; y++) {
             for (int x = 0; x < Width; x++) {
@@ -303,11 +393,18 @@ public class NodeMap<T> {
     public Node<T> GetNode(int x, int y) => Map[x, y];
     public Node<T> GetNode(Vector2 pos) => Map[(int)pos.X, (int)pos.Y];
 
+    public Node<T> GetNode(T value) => NodeList.FirstOrDefault(n => n.Value.Equals(value));
+
+    public List<Node<T>> GetNodes(T value) => NodeList.Where(n => n.Value.Equals(value)).ToList();
+
     public override string ToString() {
         var sb = new StringBuilder();
         for (int y = 0; y < Height; y++) {
             for (int x = 0; x < Width; x++) {
-                sb.Append(Map[x, y].Value);
+                if (Map[x, y] is null)
+                    sb.Append(" ");
+                else
+                    sb.Append(Map[x, y].Value);
             }
 
             sb.AppendLine();

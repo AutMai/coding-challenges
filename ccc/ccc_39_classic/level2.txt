@@ -1,0 +1,64 @@
+using CodingHelper;
+
+var r = new InputReader(2, false, " ", true);
+
+
+foreach (var l in r.GetInputs()) {
+    l.SetOutput();
+
+    var n = l.ReadInt();
+
+    for (int i = 0; i < n; i++) {
+        var pathInstructions = l.Read();
+        var nodeList = new List<Node<char>>();
+        var start = new Node<char>();
+        nodeList.Add(start);
+        var currentNode = start;
+
+        foreach (var direction in pathInstructions) {
+            // if start not already has a value assign it
+            if (start.Value == default) {
+                start.Value = direction;
+                start.PosX = 0;
+                start.PosY = 0;
+            }
+            else {
+                // check value of start and add a neighbor in the corresponding direction
+                switch (currentNode.Value) {
+                    case 'W':
+                        currentNode.Top = new Node<char>(direction) { PosX = currentNode.PosX, PosY = currentNode.PosY - 1};
+                        nodeList.Add(currentNode.Top);
+                        currentNode = currentNode.Top;
+                        break;
+                    case 'S':
+                        currentNode.Bottom = new Node<char>(direction) {PosX = currentNode.PosX, PosY = currentNode.PosY + 1};
+                        nodeList.Add(currentNode.Bottom);
+                        currentNode = currentNode.Bottom;
+                        break;
+                    case 'D':
+                        currentNode.Right = new Node<char>(direction) {PosX = currentNode.PosX + 1, PosY = currentNode.PosY};
+                        nodeList.Add(currentNode.Right);
+                        currentNode = currentNode.Right;
+                        break;
+                    case 'A':
+                        currentNode.Left = new Node<char>(direction) {PosX = currentNode.PosX - 1, PosY = currentNode.PosY};
+                        nodeList.Add(currentNode.Left);
+                        currentNode = currentNode.Left;
+                        break;
+                }
+            }
+        }
+
+
+        var nm = new NodeMap<char>(nodeList);
+        Console.WriteLine($"{nm.Width} {nm.Height}");
+
+
+    }
+
+
+}
+
+class Path {
+    
+}

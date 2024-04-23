@@ -1,0 +1,114 @@
+using System.Text;
+using CodingHelper;
+
+var r = new InputReader(3, false, " ", true);
+
+
+foreach (var l in r.GetInputs()) {
+    l.SetOutput();
+
+    var nLawn = l.ReadInt();
+
+    for (int i = 0; i < nLawn; i++) {
+        var lawnHeight = int.Parse(l.Read().Split(" ")[1]);
+        var lines = new List<string>();
+        for (int j = 0; j < lawnHeight; j++) {
+            lines.Add(l.Read());
+        }
+
+        var lawn = new NodeMap<char>(lines);
+
+        var pathInstructions = l.Read();
+        var nodeList = new List<Node<char>>();
+        var start = new Node<char>();
+        nodeList.Add(start);
+        var currentNode = start;
+
+        for (int j = 0; j < pathInstructions.Length + 1; j++) {
+            // if start not already has a value assign it
+                
+            var direction = (j == pathInstructions.Length) ? 'E' : pathInstructions[j];
+            if (start.Value == default) {
+                start.Value = direction;
+                start.PosX = 0;
+                start.PosY = 0;
+            }
+            else {
+                // check value of start and add a neighbor in the corresponding direction
+                switch (currentNode.Value) {
+                    case 'W':
+                        currentNode.Top = new Node<char>(direction)
+                            { PosX = currentNode.PosX, PosY = currentNode.PosY - 1 };
+                        nodeList.Add(currentNode.Top);
+                        currentNode = currentNode.Top;
+                        break;
+                    case 'S':
+                        currentNode.Bottom = new Node<char>(direction)
+                            { PosX = currentNode.PosX, PosY = currentNode.PosY + 1 };
+                        nodeList.Add(currentNode.Bottom);
+                        currentNode = currentNode.Bottom;
+                        break;
+                    case 'D':
+                        currentNode.Right = new Node<char>(direction)
+                            { PosX = currentNode.PosX + 1, PosY = currentNode.PosY };
+                        nodeList.Add(currentNode.Right);
+                        currentNode = currentNode.Right;
+                        break;
+                    case 'A':
+                        currentNode.Left = new Node<char>(direction)
+                            { PosX = currentNode.PosX - 1, PosY = currentNode.PosY };
+                        nodeList.Add(currentNode.Left);
+                        currentNode = currentNode.Left;
+                        break;
+                }
+            }
+        }
+        
+
+        var path = new NodeMap<char>(nodeList);
+        
+        if (path.IsValid(lawn)) {
+            Console.WriteLine("VALID");
+        }
+        else {
+            Console.WriteLine("INVALID");
+        }
+        
+    }
+}
+
+class Path { }
+
+class NodeList {
+    public List<Node<char>> Nodes { get; set; }
+
+    public NodeList(List<Node<char>> nodes) {
+        Nodes = nodes;
+    }
+
+    public override string ToString() {
+        // print matrix of the nodes and mark field red that contain two nodes
+        var maxX = Nodes.Max(n => n.PosX);
+        var maxY = Nodes.Max(n => n.PosY);
+        var matrix = new char[maxY + 1, maxX + 1];
+        foreach (var node in Nodes) {
+            // if the postion is already taken mark it red
+            if (matrix[node.PosY, node.PosX] != default) {
+                matrix[node.PosY, node.PosX] = 'X';
+            }
+            else {
+                matrix[node.PosY, node.PosX] = node.Value;
+            }
+        }
+
+        var sb = new StringBuilder();
+        for (int i = 0; i < maxY + 1; i++) {
+            for (int j = 0; j < maxX + 1; j++) {
+                sb.Append(matrix[i, j]);
+            }
+
+            sb.AppendLine();
+        }
+        return sb.ToString();
+    }
+}
