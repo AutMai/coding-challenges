@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ccc_33_classic_practice_qua
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ccc_39_classic", "ccc_39_classic\ccc_39_classic.csproj", "{829F8159-480D-4661-B28E-4CC6C730E668}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ccc_40_classic", "ccc_40_classic\ccc_40_classic.csproj", "{5DA39691-69FE-4F2E-B81E-66E6EE16C631}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,5 +92,9 @@ Global
 		{829F8159-480D-4661-B28E-4CC6C730E668}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{829F8159-480D-4661-B28E-4CC6C730E668}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{829F8159-480D-4661-B28E-4CC6C730E668}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DA39691-69FE-4F2E-B81E-66E6EE16C631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DA39691-69FE-4F2E-B81E-66E6EE16C631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DA39691-69FE-4F2E-B81E-66E6EE16C631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DA39691-69FE-4F2E-B81E-66E6EE16C631}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

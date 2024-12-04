@@ -1,0 +1,22 @@
+﻿using System.Text;
+using CodingHelper;
+
+var r = new InputReader(1, false, " ", true);
+
+
+foreach (var l in r.GetInputs()) {
+    l.SetOutput();
+
+    var nLawn = l.ReadInt();
+
+    for (int i = 0; i < nLawn; i++) {
+        var s = l.Read();
+        // count character W in string
+        var wCount = s.Count(c => c == 'W');
+        var dCount = s.Count(c => c == 'D');
+        var sCount = s.Count(c => c == 'S');
+        var aCount = s.Count(c => c == 'A');
+
+        Console.WriteLine($"{wCount} {dCount} {sCount} {aCount}");
+    }
+}

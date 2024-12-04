@@ -1,0 +1,226 @@
+﻿using ccc_40_classic;
+using CodingHelper;
+
+var r = new InputReader(5, true, " ", false);
+
+
+foreach (var l in r.GetInputs()) {
+    l.SetOutput();
+
+    var nLawn = l.ReadInt();
+
+    for (var i = 0; i < nLawn; i++) {
+        var x = l.ReadInt();
+        var y = l.ReadInt();
+        var deskAmount = l.ReadInt();
+        
+        var room = new Room(x, y, deskAmount);
+        
+        Console.WriteLine(room.GetRoomMap());
+    }
+}
+
+----
+
+using System.Numerics;
+using System.Text;
+
+namespace ccc_40_classic;
+
+public class Room {
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public int DeskAmount { get; set; }
+
+    public const int DeskWidth = 2;
+    public const int DeskHeight = 1;
+    
+    public Room(int width, int height, int deskAmount) {
+        Width = width;
+        Height = height;
+        DeskAmount = deskAmount;
+        ArrangeDesks();
+    }
+
+    public HashSet<Desk> ArrangedDesks { get; set; } = new HashSet<Desk>();
+    public int CurrentId { get; set; } = 1;
+
+    public void ArrangeDesks() {
+        
+        ArrangeDesksHorizontally();
+        ArrangeDesksVertically();
+        
+        if (DeskAmount == ArrangedDesks.Count()) {
+            return;
+        }
+        else {
+            // try the other way around
+            ArrangedDesks = new HashSet<Desk>();
+            CurrentId = 1;
+            ArrangeDesksVertically();
+            ArrangeDesksHorizontally();
+            
+            if (DeskAmount == ArrangedDesks.Count()) {
+                return;
+            }
+            else {
+                throw new Exception("Could not arrange desks");
+            }
+        }
+            
+    }
+
+    public void ArrangeDesksHorizontally() {
+        for (var y = 0; y < Height; y++) {
+            for (var x = 0; x < Width; x++) {
+                // check if there is a desk at this position
+                if (ArrangedDesks.Any(d => d.DeskPositions.Any(p => p.X == x && p.Y == y))) {
+                    continue;
+                }
+
+                // create a new desk
+                var desk = new Desk(CurrentId, DeskWidth, DeskHeight, new Vector2(x, y));
+
+
+                // check if there is enough space for the desk
+                if (desk.DeskPositions.Any(p => p.X >= Width || p.Y >= Height)) {
+                    ArrangedDesks.Remove(desk);
+                    continue;
+                }
+
+                // check if the desk collides with any other desk
+                if (ArrangedDesks.Any(d => d.CollidesWithGap(desk))) {
+                    ArrangedDesks.Remove(desk);
+                    continue;
+                }
+
+                ArrangedDesks.Add(desk);
+                CurrentId++;
+                if (ArrangedDesks.Count() == DeskAmount) {
+                    return;
+                }
+            }
+        }
+    }
+
+    public void ArrangeDesksVertically() {
+        for (var x = Width - 1; x >= 0; x--) {
+            for (var y = 0; y < Height; y++) {
+                if (ArrangedDesks.Any(d => d.DeskPositions.Any(p => p.X == x && p.Y == y))) {
+                    continue;
+                }
+
+                var desk = new Desk(CurrentId, DeskHeight, DeskWidth, new Vector2(x, y));
+
+
+                if (desk.DeskPositions.Any(p => p.X >= Width || p.Y >= Height)) {
+                    ArrangedDesks.Remove(desk);
+                    continue;
+                }
+
+                if (ArrangedDesks.Any(d => d.CollidesWithGap(desk))) {
+                    ArrangedDesks.Remove(desk);
+                    continue;
+                }
+
+                ArrangedDesks.Add(desk);
+                CurrentId++;
+                if (ArrangedDesks.Count() == DeskAmount) {
+                    ArrangedDesks = ArrangedDesks;
+                    return;
+                }
+            }
+        }
+    }
+
+    public string GetRoomMap() {
+        // display each tile of desk as their id but leave spaces in each tile for the whole room
+        var sb = new StringBuilder();
+
+        for (var y = 0; y < Height; y++) {
+            for (var x = 0; x < Width; x++) {
+                var desk = ArrangedDesks.FirstOrDefault(d => d.DeskPositions.Any(p => p.X == x && p.Y == y));
+
+                if (desk != null) {
+                    sb.Append("X");
+                }
+                else {
+                    sb.Append(".");
+                }
+
+                // if (x != Width - 1) {
+                //     sb.Append(" ");
+                // }
+            }
+
+            sb.AppendLine();
+        }
+
+        return sb.ToString();
+    }
+}
+
+----
+
+
+using System.Numerics;
+
+namespace ccc_40_classic;
+
+public class Desk {
+    public int Id { get; set; }
+
+    public int XWidth { get; set; }
+    public int YHeight { get; set; }
+    
+    public Vector2 Position {get; set;}
+    
+    public const int XOffset = 1;
+    public const int YOffset = 1;
+
+    public Desk(int id, int xWidth, int yHeight, Vector2 position) {
+        Id = id;
+        XWidth = xWidth;
+        YHeight = yHeight;
+        Position = position;
+        DeskPositions = GetDeskPositions();
+        DeskPositionsWithGap = GetDeskPositionsWithGap();
+    }
+
+    public IEnumerable<Vector2> DeskPositions { get; set; }
+    public IEnumerable<Vector2> DeskPositionsWithGap { get; set; }
+    
+    private IEnumerable<Vector2> GetDeskPositions() {
+        var positions = new List<Vector2>();
+        
+        for (var x = 0; x < XWidth; x++) {
+            for (var y = 0; y < YHeight; y++) {
+                positions.Add(new Vector2(Position.X + x, Position.Y + y));
+            }
+        }
+        
+        return positions;
+    }
+    
+    private IEnumerable<Vector2> GetDeskPositionsWithGap() {
+        var positions = new List<Vector2>();
+        
+        for (var x = 0 - XOffset; x < XWidth + XOffset; x++) {
+            for (var y = 0 - YOffset; y < YHeight + YOffset; y++) {
+                positions.Add(new Vector2(Position.X + x, Position.Y + y));
+            }
+        }
+        
+        return positions;
+    }
+    
+    public bool CollidesWith(Desk other) {
+        return DeskPositions.Any(p => other.DeskPositions.Any(p2 => p2 == p));
+    }
+    
+    // another version of collides with that checks for the gap
+    public bool CollidesWithGap(Desk other) {
+        // but keep in mind if gap is 1, then one desk should use normal border and the other should use the gap border because else we would have a gap of 2
+        return DeskPositions.Any(p => other.DeskPositionsWithGap.Any(p2 => p2 == p));
+    }
+}

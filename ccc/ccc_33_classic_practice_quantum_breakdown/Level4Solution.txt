@@ -79,3 +79,5 @@ foreach (var l in r.GetInputs()) {
 public record FlightEntry(int FlightId, int Timestamp);
 
 public record Coordinate(int TimestampOffset, double Latitude, double Longitude, double Altitude);
+
+// completed level 4 in about an hour (maybe 50 min)

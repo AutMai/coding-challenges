@@ -29,6 +29,22 @@ public class Node<T> {
     public Node<T>? BottomRight { get; set; }
     public List<Node<T>> Neighbors { get; set; } = new();
     public List<Node<T>> FullNeighbors { get; set; } = new();
+    
+    public List<Node<T>> ExcludeNeighbors(HashSet<T> exclude) {
+        return Neighbors.Where(k => !exclude.Contains(k.Value)).ToList();
+    }
+    
+    public List<Node<T>> ExcludeFullNeighbors(HashSet<T> exclude) {
+        return FullNeighbors.Where(k => !exclude.Contains(k.Value)).ToList();
+    }
+    
+    public bool IsNeighbor(Node<T> node) {
+        return Neighbors.Contains(node);
+    }
+    
+    public bool IsFullNeighbor(Node<T> node) {
+        return FullNeighbors.Contains(node);
+    }
 
     public List<Node<T>> SortedNeighbors() {
         var list = new List<Node<T>>();

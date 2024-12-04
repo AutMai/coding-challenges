@@ -1,14 +1,11 @@
 ﻿using System.Text;
 using CodingHelper;
 
-var r = new InputReader(5, false, " ", true);
+var r = new InputReader(6, true, " ", true);
 
 
 foreach (var l in r.GetInputs()) {
-    Console.WriteLine();
-    Console.WriteLine(l.Index);
-    Console.WriteLine();
-    l.SetOutput();
+    //l.SetOutput();
 
     var nLawn = l.ReadInt();
 
@@ -20,18 +17,8 @@ foreach (var l in r.GetInputs()) {
         }
 
         var lawn = new NodeMap<char>(lines);
-        var treeNodes = lawn.GetNode('X');
-        
-        // remove tree node but correct the neighbors 
-        foreach (var node in treeNodes.FullNeighbors) {
-            node.RemoveNeighbor(treeNodes);
-        }
-        
-        var path = lawn.FindPath();
-        // foreach (var p in paths) {
-        //     lawn.PrintPath(p);
-        //     Console.WriteLine();
-        // }
+
+        var path = lawn.FindHamiltonianCycle(node => node.ExcludeNeighbors(['X']), ['X']);
         var inst = lawn.ConvertPathToInstructions(path);
         Console.WriteLine(inst);
     }

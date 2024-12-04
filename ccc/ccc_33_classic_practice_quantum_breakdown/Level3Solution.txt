@@ -46,4 +46,4 @@ public record FlightEntry(double Latitude, double Longitude, double Altitude);
 
 public record ECEF(double X, double Y, double Z);
 
-// completed after about 1 hour
+// levl 1-3 completed after about 1 hour
