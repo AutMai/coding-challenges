@@ -65,6 +65,6 @@ public class Day9 : AAocDay {
     
     private List<Node<int>> GetBasin(Node<int> node) {
         var basin = _map.FloodFill(node, new List<int>() { 9 });
-        return basin;
+        return basin.ToList();
     }
 }
