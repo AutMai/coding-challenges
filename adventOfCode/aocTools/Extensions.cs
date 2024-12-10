@@ -39,4 +39,17 @@ public static class Extensions {
     public static int lcm(int[] numbers) {
         return numbers.Aggregate((S, val) => S * val / gcd(S, val));
     }
+    
+    public static int ContainsSequence<T>(this List<T> @this, List<T> sequence) {
+        // returns the index of the first element of the sequence if it is found 
+        // in the list, -1 otherwise
+        
+        for (var i = 0; i < @this.Count - sequence.Count; i++) {
+            if (@this.GetRange(i, sequence.Count).SequenceEqual(sequence)) {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
 }
