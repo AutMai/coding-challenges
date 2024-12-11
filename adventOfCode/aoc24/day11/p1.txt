@@ -1,0 +1,84 @@
+﻿using System.Text;
+using aocTools;
+
+namespace aoc24.day11;
+
+public class Day11 : AAocDay {
+    public static HashSet<Stone> Stones = new();
+    public static HashSet<Stone> OriginalStones = new();
+    public Day11() : base() {
+        ReadInput();
+    }
+
+    private void ReadInput() {
+        var line = InputTokens.Read();
+        var stones = line.Split(' ');
+        foreach (var stone in stones) {
+            Stones.Add(new Stone(long.Parse(stone)));
+        }
+        
+        OriginalStones = new HashSet<Stone>(Stones);
+    }
+
+    public override void PuzzleOne() {
+        PrintStones();
+        for (int i = 0; i < 25; i++) {
+            Blink();
+            //PrintStones();
+        }
+
+        Console.WriteLine($"There are {Stones.Count} stones after 25 blinks.");
+    }
+
+    private void Blink() {
+        var newStones = new HashSet<Stone>();
+        foreach (var stone in Stones) {
+            newStones.UnionWith(stone.Blink());
+        }
+        Stones = newStones;
+    }
+
+    private void PrintStones() {
+        var sb = new StringBuilder();
+        foreach (var stone in Stones) {
+            sb.Append(stone.Value).Append(' ');
+        }
+        Console.WriteLine(sb.ToString());
+    }
+    
+    public override void PuzzleTwo() {
+        Stones = new HashSet<Stone>(OriginalStones);
+        for (int i = 0; i < 75; i++) {
+            Console.WriteLine($"Blink {i}");
+            Blink();
+            //PrintStones();
+        }
+
+        Console.WriteLine($"There are {Stones.Count} stones after 75 blinks.");
+    }
+}
+
+public class Stone {
+    public long Value { get; set; }
+
+    public Stone(long value) {
+        Value = value;
+    }
+
+    public IEnumerable<Stone> Blink() {
+        // If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1.
+        if (Value == 0) {
+            return new List<Stone> { new Stone(1) };
+        }
+
+        //  If the stone is engraved with a number that has an even number of digits, it is replaced by two stones. The left half of the digits are engraved on the new left stone, and the right half of the digits are engraved on the new right stone. (The new numbers don't keep extra leading zeroes: 1000 would become stones 10 and 0.)
+        var valueStr = Value.ToString();
+        if (valueStr.Length % 2 == 0) {
+            var half = valueStr.Length / 2;
+            return new List<Stone> { new Stone(long.Parse(valueStr[..half])), new Stone(long.Parse(valueStr[half..])) };
+        }
+        
+        // If none of the other rules apply, the stone is replaced by a new stone; the old stone's number multiplied by 2024 is engraved on the new stone.
+        return new List<Stone> { new Stone(Value * 2024) };
+    }
+}
