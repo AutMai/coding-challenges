@@ -230,7 +230,7 @@ public class NodeMap<T> {
 
     // implement flood fill algorithm which is a special case of bfs and returns a list of nodes that have a certain value and are connected to a start node
 
-    public HashSet<Node<T>> FloodFill(Node<T> start, List<T>? exclude = null, HashSet<Node<T>>? excludeNodes = null) {
+    public HashSet<Node<T>> FloodFill(Node<T> start, List<T>? exclude = null, HashSet<Node<T>>? excludeNodes = null, List<T>? include = null) {
         var visited = new HashSet<Node<T>>();
         var queue = new Queue<Node<T>>();
         queue.Enqueue(start);
@@ -245,6 +245,8 @@ public class NodeMap<T> {
                 if (exclude is not null && exclude.Contains(neighbor.Value))
                     continue;
                 if (excludeNodes is not null && excludeNodes.Contains(neighbor))
+                    continue;
+                if (include is not null && !include.Contains(neighbor.Value))
                     continue;
                 queue.Enqueue(neighbor);
             }
@@ -620,6 +622,16 @@ public class NodeMap<T> {
         // gethashcode should return the hashcode of the path and the current node
         public override int GetHashCode() {
             return Path.GetHashCode() ^ Current.GetHashCode();
+        }
+    }
+
+    public void PrintMap() {
+        for (var y = 0; y < Height; y++) {
+            for (var x = 0; x < Width; x++) {
+                Console.Write(Map[x, y].Value);
+            }
+
+            Console.WriteLine();
         }
     }
 }
