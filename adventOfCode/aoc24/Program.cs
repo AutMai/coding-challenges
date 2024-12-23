@@ -1,4 +1,4 @@
-﻿using aoc24.day14;
-var day = new Day14();
+﻿using aoc24.day17;
+var day = new Day17();
 day.PuzzleOne();
 day.PuzzleTwo();

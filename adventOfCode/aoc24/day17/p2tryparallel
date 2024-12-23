@@ -1,0 +1,212 @@
+﻿using System.Collections.Concurrent;
+using System.Numerics;
+using System.Text;
+using aocTools;
+using Raylib_cs;
+using static Raylib_cs.Raylib;
+using static Raylib_cs.Color;
+using static Raylib_cs.KeyboardKey;
+using static Raylib_cs.MouseButton;
+
+namespace aoc24.day17;
+
+public class Day17 : AAocDay {
+    public Day17() : base(false, true) { }
+    
+    private Computer _computer = new Computer();
+
+    private void ReadInput() {
+        var a = InputTokens.Read().Replace("Register A: ", "");
+        var b = InputTokens.Read().Replace("Register B: ", "");
+        var c = InputTokens.Read().Replace("Register C: ", "");
+        var i = InputTokens.Read().Replace("Program: ", "").Split(",");
+
+        _computer.RegisterA = int.Parse(a);
+        _computer.RegisterB = int.Parse(b);
+        _computer.RegisterC = int.Parse(c);
+        _computer.Instructions = new int[i.Length];
+        for (var j = 0; j < i.Length; j++) {
+            _computer.Instructions[j] = int.Parse(i[j]);
+        }
+    }
+
+    public override void PuzzleOne() {
+        ReadInput();
+        _computer.Execute();
+        Console.WriteLine(string.Join(",", _computer.Output));
+    }
+
+    public override void PuzzleTwo() {
+        _computer.Reset();
+        ResetInput();
+        ReadInput();
+        
+        var desiredOutput = new int[_computer.Instructions.Length];
+        for (var i = 0; i < desiredOutput.Length; i++) {
+            desiredOutput[i] = _computer.Instructions[i];
+        }
+
+        Parallel.For(0, 120000, (i, state) => {
+            var registerA = i;
+            var computer = _computer.Clone();
+            computer.RegisterA = registerA;
+            Console.WriteLine($"Trying {registerA}");
+            computer.Execute();
+            
+            // compare computer.Output with desiredOutput
+            var outputMatches = true;
+            for (var j = 0; j < computer.Output.Count; j++) {
+                if (computer.Output.Take() != desiredOutput[j]) {
+                    outputMatches = false;
+                    break;
+                }
+            }
+
+            if (outputMatches) {
+                throw new Exception($"Found {registerA}");
+                state.Break();
+            }
+        });
+    }
+}
+
+public class Computer {
+    public int RegisterA { get; set; }
+    public int RegisterB { get; set; }
+    public int RegisterC { get; set; }
+
+    public int InstructionPointer { get; set; }
+    public int[] Instructions { get; set; }
+    
+    public BlockingCollection<int> Output { get; set; } = new();
+    
+    public Computer Clone() {
+        return new Computer {
+            RegisterA = RegisterA,
+            RegisterB = RegisterB,
+            RegisterC = RegisterC,
+            InstructionPointer = InstructionPointer,
+            Instructions = Instructions,
+            Output = Output
+        };
+    }
+
+    public void Reset() {
+        RegisterA = 0;
+        RegisterB = 0;
+        RegisterC = 0;
+        InstructionPointer = 0;
+        Output = new BlockingCollection<int>();
+    }
+
+    public void Execute() {
+        while (InstructionPointer < Instructions.Length) {
+            var instruction = Instructions[InstructionPointer];
+            AInstruction aInstruction = instruction switch {
+                0 => new Adv(),
+                1 => new Bxl(),
+                2 => new Bst(),
+                3 => new Jnz(),
+                4 => new Bxc(),
+                5 => new Out(),
+                6 => new Bdv(),
+                7 => new Cdv(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            aInstruction.Execute(this, GetLiteralOperand(), GetComboOperand());
+        }
+    }
+
+
+    public int GetComboOperand() {
+        var o = GetLiteralOperand();
+        return o switch {
+            0 => 0,
+            1 => 1,
+            2 => 2,
+            3 => 3,
+            4 => RegisterA,
+            5 => RegisterB,
+            6 => RegisterC,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    public int GetLiteralOperand() {
+        return Instructions[InstructionPointer + 1];
+    }
+}
+
+public abstract class AInstruction {
+    public abstract void Execute(Computer computer, int literalOperand, int comboOperand);
+}
+
+public class Adv : AInstruction {
+    public override void Execute(Computer computer, int literalOperand, int comboOperand) {
+        var denominator = (int)Math.Pow(2, comboOperand);
+        computer.RegisterA = (int)Math.Truncate((double)(computer.RegisterA / denominator));
+        
+        computer.InstructionPointer += 2;
+    }
+}
+
+public class Bxl : AInstruction {
+    public override void Execute(Computer computer, int literalOperand, int comboOperand) {
+        computer.RegisterB = computer.RegisterB ^ literalOperand;
+
+        computer.InstructionPointer += 2;
+    }
+}
+
+public class Bst : AInstruction {
+    public override void Execute(Computer computer, int literalOperand, int comboOperand) {
+        computer.RegisterB = comboOperand % 8;
+
+        computer.InstructionPointer += 2;
+    }
+}
+
+public class Jnz : AInstruction {
+    public override void Execute(Computer computer, int literalOperand, int comboOperand) {
+        if (computer.RegisterA != 0) {
+            computer.InstructionPointer = literalOperand;
+        }
+        else {
+            computer.InstructionPointer += 2;
+        }
+    }
+}
+
+public class Bxc : AInstruction {
+    public override void Execute(Computer computer, int literalOperand, int comboOperand) {
+        computer.RegisterB = computer.RegisterB ^ computer.RegisterC;
+
+        computer.InstructionPointer += 2;
+    }
+}
+
+public class Out : AInstruction {
+    public override void Execute(Computer computer, int literalOperand, int comboOperand) {
+        computer.Output.Add(comboOperand % 8);
+
+        computer.InstructionPointer += 2;
+    }
+}
+
+public class Bdv : AInstruction {
+    public override void Execute(Computer computer, int literalOperand, int comboOperand) {
+        var denominator = (int)Math.Pow(2, comboOperand);
+        computer.RegisterB = (int)Math.Truncate((double)(computer.RegisterA / denominator));
+
+        computer.InstructionPointer += 2;
+    }
+}
+
+public class Cdv : AInstruction {
+    public override void Execute(Computer computer, int literalOperand, int comboOperand) {
+        var denominator = (int)Math.Pow(2, comboOperand);
+        computer.RegisterC = (int)Math.Truncate((double)(computer.RegisterA / denominator));
+
+        computer.InstructionPointer += 2;
+    }
+}
